@@ -3,8 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <title>Tetris Shape Game</title>
+    <style>
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #game-container { position: relative; }
+        .modal {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            width: 300px;
+        }
+        .modal input, .modal button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .leaderboard {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .highlight { background-color: #ffff99; }
+    </style>
 </head>
 <body>
+    <div id="game-container">
+        <!-- Win Modal -->
+        <div id="win-modal" class="modal">
+            <h2>You Win!</h2>
+            <p>Your score: <span id="final-score">0</span></p>
+            <input type="text" id="player-initials" placeholder="Your Initials (3 letters)" maxlength="3">
+            <input type="email" id="player-email" placeholder="Your Email (required)" required>
+            <button id="submit-score">Submit Score</button>
+            <button id="play-again">Play Again</button>
+        </div>
+        
+        <!-- Leaderboard Modal -->
+        <div id="leaderboard-modal" class="modal">
+            <h2>Leaderboard</h2>
+            <div id="leaderboard-entries" class="leaderboard"></div>
+            <button id="close-leaderboard">Close</button>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
     <script src="game.js"></script>
 </body>
