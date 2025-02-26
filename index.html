@@ -2,10 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Tetris Shape Game</title>
+    <title>Shape Puzzle Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #game-container { position: relative; }
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4fc1e9;
+            --background-color: #f5f7fa;
+            --text-color: #333;
+            --light-gray: #e0e6ed;
+            --dark-gray: #4a5568;
+            --success-color: #48cfad;
+            --error-color: #ed5565;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        #game-container {
+            position: relative;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .game-info div {
+            background-color: var(--light-gray);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: var(--dark-gray);
+        }
+        
+        canvas {
+            display: block;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
         .modal {
             display: none;
             position: absolute;
@@ -13,43 +79,163 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
             z-index: 10;
-            width: 300px;
+            width: 350px;
+            text-align: center;
         }
-        .modal input, .modal button {
+        
+        .modal h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .modal p {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .modal input {
             display: block;
             width: 100%;
-            margin: 10px 0;
-            padding: 8px;
-            box-sizing: border-box;
+            margin: 15px 0;
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
+        
+        .modal input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+        
+        .modal button {
+            display: block;
+            width: 100%;
+            margin: 15px 0;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--primary-color);
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .modal button:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .modal button:disabled {
+            background-color: var(--light-gray);
+            cursor: not-allowed;
+        }
+        
         .leaderboard {
-            max-height: 200px;
+            max-height: 300px;
             overflow-y: auto;
-            margin-top: 10px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
         }
+        
         .leaderboard-entry {
             display: flex;
             justify-content: space-between;
-            padding: 5px 0;
-            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--light-gray);
         }
-        .highlight { background-color: #ffff99; }
+        
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+        
+        .leaderboard-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .highlight {
+            background-color: rgba(79, 193, 233, 0.2);
+            font-weight: 600;
+        }
+        
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 5;
+        }
+        
+        .instructions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .instructions-modal {
+            max-width: 450px;
+        }
+        
+        .instructions-modal ul {
+            text-align: left;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions-modal li {
+            margin-bottom: 10px;
+        }
+        
+        footer {
+            margin-top: 20px;
+            color: var(--dark-gray);
+            font-size: 14px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <h1>Shape Puzzle Challenge</h1>
+    
     <div id="game-container">
+        <div class="game-info">
+            <div id="time-display">Time: 0s</div>
+            <div id="score-display">Score: 10000</div>
+        </div>
+        
+        <button class="instructions" id="instructions-button">?</button>
+        
         <!-- Win Modal -->
         <div id="win-modal" class="modal">
-            <h2>You Win!</h2>
+            <h2>Puzzle Completed!</h2>
             <p>Your score: <span id="final-score">0</span></p>
             <input type="text" id="player-initials" placeholder="Your Initials (3 letters)" maxlength="3">
             <input type="email" id="player-email" placeholder="Your Email (required)" required>
             <button id="submit-score">Submit Score</button>
-            <button id="play-again">Play Again</button>
+            <button id="play-again" style="background-color: var(--success-color);">Play Again</button>
         </div>
         
         <!-- Leaderboard Modal -->
@@ -58,7 +244,26 @@
             <div id="leaderboard-entries" class="leaderboard"></div>
             <button id="close-leaderboard">Close</button>
         </div>
+        
+        <!-- Instructions Modal -->
+        <div id="instructions-modal" class="modal instructions-modal">
+            <h2>How to Play</h2>
+            <ul>
+                <li>Drag and place the colored shapes to fill the pattern</li>
+                <li>Right-click to rotate shapes</li>
+                <li>Complete the pattern to win</li>
+                <li>Faster completion = higher score</li>
+                <li>Avoid covering areas outside the pattern</li>
+            </ul>
+            <button id="close-instructions">Got it!</button>
+        </div>
     </div>
+    
+    <div class="overlay" id="modal-overlay"></div>
+    
+    <footer>
+        &copy; 2023 Shape Puzzle Challenge | Created with ♥
+    </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>

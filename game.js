@@ -1,5 +1,5 @@
-let gridSize = 12; // 12x12 grid
-let cellSize = 30; // Size of each cell in pixels
+let gridSize = 15; // 15x15 grid
+let cellSize = 35; // Increase cell size from 30 to 35 pixels
 let grid = []; // 2D array for placed tiles
 let targetShape = []; // Coordinates of the target pattern (cat)
 let tiles = []; // Available Tetris tiles
@@ -28,11 +28,18 @@ let leaderboardEntriesElement;
 let closeLeaderboardButton;
 let gameContainer;
 let currentPlayerRank = null;
+let timeDisplay;
+let scoreDisplay;
+let modalOverlay;
+let instructionsButton;
+let instructionsModal;
+let closeInstructionsButton;
 
 function setup() {
-  const canvas = createCanvas(400, 550);
+  // Update canvas size to fit the larger grid and cell size (15*35 = 525px for grid)
+  const canvas = createCanvas(525, 675);
   gameContainer = document.getElementById("game-container");
-  canvas.parent(gameContainer); // Use p5's parent() method instead of appendChild
+  canvas.parent(gameContainer);
 
   // Initialize DOM elements
   winModal = document.getElementById("win-modal");
@@ -45,10 +52,20 @@ function setup() {
   leaderboardEntriesElement = document.getElementById("leaderboard-entries");
   closeLeaderboardButton = document.getElementById("close-leaderboard");
 
+  // New elements
+  timeDisplay = document.getElementById("time-display");
+  scoreDisplay = document.getElementById("score-display");
+  modalOverlay = document.getElementById("modal-overlay");
+  instructionsButton = document.getElementById("instructions-button");
+  instructionsModal = document.getElementById("instructions-modal");
+  closeInstructionsButton = document.getElementById("close-instructions");
+
   // Add event listeners
   submitScoreButton.addEventListener("click", submitScore);
   playAgainButton.addEventListener("click", resetGame);
   closeLeaderboardButton.addEventListener("click", closeLeaderboard);
+  instructionsButton.addEventListener("click", showInstructions);
+  closeInstructionsButton.addEventListener("click", closeInstructions);
 
   initializeGrid();
   defineTargetShape();
@@ -56,13 +73,13 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background("#f0f4f8"); // Light blue-gray background
   drawGrid();
   drawTargetShape();
   drawTiles();
   if (selectedTile) drawSelectedTile();
   updateTimer();
-  displayScoreAndTimer();
+  updateScoreAndTimerDisplay();
   if (gameWon) displayWinMessage();
 }
 
@@ -76,87 +93,70 @@ function initializeGrid() {
   }
 }
 
-// Define a random target shape instead of the fixed cat shape
+// Define a random target shape for the larger grid
 function defineTargetShape() {
   // Clear the target shape array
   targetShape = [];
 
-  // Define possible patterns
+  // Define possible patterns for 15x15 grid (centered)
   const patterns = [
-    // Cat pattern
+    // Cat pattern (centered)
     [
-      [5, 4],
-      [6, 4],
-      [7, 4], // Head
-      [5, 5],
-      [6, 5],
-      [7, 5], // Body
-      [4, 3],
-      [8, 3], // Ears
-      [6, 6],
-      [6, 7], // Tail
+      [7, 6], [8, 6], [9, 6], // Head
+      [7, 7], [8, 7], [9, 7], // Body
+      [6, 5], [10, 5], // Ears
+      [8, 8], [8, 9], // Tail
     ],
-    // Heart pattern
+    // Heart pattern (centered)
     [
-      [5, 3],
-      [7, 3], // Top of heart
-      [4, 4],
-      [6, 4],
-      [8, 4], // Middle row
-      [5, 5],
-      [6, 5],
-      [7, 5], // Bottom row
-      [6, 6], // Point
+      [7, 5], [9, 5], // Top of heart
+      [6, 6], [8, 6], [10, 6], // Middle row
+      [7, 7], [8, 7], [9, 7], // Bottom row
+      [8, 8], // Point
     ],
-    // Smiley face
+    // Smiley face (centered)
     [
-      [5, 3],
-      [6, 3],
-      [7, 3], // Top row
-      [4, 4],
-      [8, 4], // Eyes
-      [4, 6],
-      [5, 7],
-      [6, 7],
-      [7, 7],
-      [8, 6], // Smile
+      [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Top row
+      [5, 6], [11, 6], // Eyes outer
+      [5, 8], [6, 9], [7, 9], [8, 9], [9, 9], [10, 8], // Smile
     ],
-    // Simple house
+    // House (centered)
     [
-      [6, 2], // Roof top
-      [5, 3],
-      [6, 3],
-      [7, 3], // Roof
-      [4, 4],
-      [5, 4],
-      [6, 4],
-      [7, 4],
-      [8, 4], // Upper house
-      [4, 5],
-      [5, 5],
-      [6, 5],
-      [7, 5],
-      [8, 5], // Middle house
-      [4, 6],
-      [5, 6],
-      [6, 6],
-      [7, 6],
-      [8, 6], // Lower house
+      [8, 4], // Roof top
+      [7, 5], [8, 5], [9, 5], // Roof
+      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Upper house
+      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Middle house
+      [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], // Lower house
+      [7, 7], [8, 7], // Door
     ],
-    // Flower
+    // Flower (centered)
     [
-      [6, 3], // Top petal
-      [5, 4],
-      [6, 4],
-      [7, 4], // Middle row
-      [6, 5], // Bottom petal
-      [4, 4],
-      [8, 4], // Side petals
-      [6, 6],
-      [6, 7], // Stem
+      [8, 5], // Top petal
+      [7, 6], [8, 6], [9, 6], // Middle row
+      [8, 7], // Bottom petal
+      [6, 6], [10, 6], // Side petals
+      [8, 8], [8, 9], // Stem
+    ],
+    // Spaceship (centered)
+    [
+      [8, 5], // Top
+      [7, 6], [8, 6], [9, 6], // Upper body
+      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Middle body
+      [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], // Lower body
+      [6, 9], [7, 9], [9, 9], [10, 9], // Engines
+    ],
+    // Star (centered)
+    [
+      [8, 4], // Top point
+      [8, 5], // Top connector
+      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Upper body
+      [7, 7], [8, 7], [9, 7], // Middle
+      [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], // Lower body
+      [6, 9], [10, 9], // Lower points
+      [5, 10], [11, 10], // Bottom points
     ],
   ];
-
+  
   // Choose a random pattern
   const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
   targetShape = randomPattern;
@@ -176,38 +176,64 @@ function defineTiles() {
   repositionTiles();
 }
 
-// Draw the 12x12 grid
+// Draw the 15x15 grid
 function drawGrid() {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-      stroke(0);
-      fill(grid[i][j] === 0 ? 255 : grid[i][j]); // White if empty, tile color if filled
-      rect(i * cellSize, j * cellSize, cellSize, cellSize);
+      if (grid[i][j] === 0) {
+        // Empty cell
+        stroke(200, 210, 220);
+        strokeWeight(1);
+        fill(255);
+      } else {
+        // Filled cell
+        stroke(200, 210, 220);
+        strokeWeight(1);
+        fill(grid[i][j]);
+      }
+      rect(i * cellSize, j * cellSize, cellSize, cellSize, 3); // Slightly larger rounded corners
     }
   }
 }
 
 // Draw the faint target shape (cat)
 function drawTargetShape() {
-  fill(150, 100); // Faint gray
   noStroke();
+  fill(100, 120, 200, 80); // Soft blue with transparency
   for (let [x, y] of targetShape) {
-    rect(x * cellSize, y * cellSize, cellSize, cellSize);
+    rect(x * cellSize, y * cellSize, cellSize, cellSize, 2); // Slightly rounded corners
   }
 }
 
 // Draw the available tiles below the grid
 function drawTiles() {
   for (let tile of tiles) {
-    fill(tile.color);
-    noStroke();
     let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
+
+    // Draw shadow first
+    fill(0, 0, 0, 20);
+    noStroke();
+    for (let [dx, dy] of rotatedBlocks) {
+      rect(
+        tile.posX + dx * cellSize + 2,
+        tile.posY + dy * cellSize + 2,
+        cellSize,
+        cellSize,
+        4
+      );
+    }
+
+    // Draw tile
+    fill(tile.color);
+    stroke(255);
+    strokeWeight(2);
     for (let [dx, dy] of rotatedBlocks) {
       rect(
         tile.posX + dx * cellSize,
         tile.posY + dy * cellSize,
         cellSize,
-        cellSize
+        cellSize,
+        4 // Rounded corners
       );
     }
   }
@@ -254,18 +280,35 @@ function mousePressed() {
 
 // Draw the selected tile as it's dragged
 function drawSelectedTile() {
-  fill(selectedTile.color);
-  noStroke();
   let rotatedBlocks = getRotatedBlocks(
     selectedTile.blocks,
     selectedTile.rotation
   );
+  
+  // Draw shadow
+  fill(0, 0, 0, 20);
+  noStroke();
+  for (let [dx, dy] of rotatedBlocks) {
+    rect(
+      mouseX - selectedTile.offsetX + dx * cellSize + 2,
+      mouseY - selectedTile.offsetY + dy * cellSize + 2,
+      cellSize,
+      cellSize,
+      4
+    );
+  }
+  
+  // Draw tile
+  fill(selectedTile.color);
+  stroke(255);
+  strokeWeight(2);
   for (let [dx, dy] of rotatedBlocks) {
     rect(
       mouseX - selectedTile.offsetX + dx * cellSize,
       mouseY - selectedTile.offsetY + dy * cellSize,
       cellSize,
-      cellSize
+      cellSize,
+      4
     );
   }
 }
@@ -352,7 +395,7 @@ function addNewTile() {
         [0, 2],
         [1, 2],
       ],
-      color: "red",
+      color: "#FF6B6B", // Coral red
     }, // L-shape
     {
       blocks: [
@@ -361,7 +404,7 @@ function addNewTile() {
         [2, 0],
         [1, 1],
       ],
-      color: "blue",
+      color: "#4FC1E9", // Sky blue
     }, // T-shape
     {
       blocks: [
@@ -370,7 +413,7 @@ function addNewTile() {
         [1, 0],
         [1, 1],
       ],
-      color: "yellow",
+      color: "#FFCE54", // Soft yellow
     }, // Square
     {
       blocks: [
@@ -379,7 +422,7 @@ function addNewTile() {
         [2, 0],
         [3, 0],
       ],
-      color: "green",
+      color: "#A0D468", // Lime green
     }, // I-shape
     {
       blocks: [
@@ -388,7 +431,7 @@ function addNewTile() {
         [1, 1],
         [2, 1],
       ],
-      color: "purple",
+      color: "#AC92EC", // Lavender
     }, // Z-shape
     {
       blocks: [
@@ -397,28 +440,51 @@ function addNewTile() {
         [1, 1],
         [2, 0],
       ],
-      color: "orange",
+      color: "#EC87C0", // Pink
     }, // S-shape
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [0, 1],
+      ],
+      color: "#5D9CEC", // Blue
+    }, // J-shape
   ];
-
+  
   // Choose a random shape
   const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-
-  // Add the new tile (position will be set by repositionTiles)
+  
+  // Add the new tile with temporary position
   tiles.push({
     blocks: randomShape.blocks,
-    posX: 0, // Temporary position, will be updated by repositionTiles
-    posY: 400,
+    posX: 0, // Will be updated by repositionTiles
+    posY: gridSize * cellSize + 20, // Just below the grid
     color: randomShape.color,
     rotation: 0,
   });
+  
+  // Reposition all tiles
+  repositionTiles();
 }
 
-// Reposition tiles to fit in the bottom area
+// Update the repositionTiles function to place tiles below the grid
 function repositionTiles() {
-  const spacing = 300 / tiles.length;
+  // Calculate the total width of the grid
+  const gridWidth = gridSize * cellSize;
+  
+  // Calculate the starting Y position (just below the grid)
+  const startY = gridSize * cellSize + 20; // 20px padding below grid
+  
+  // Calculate spacing between tiles based on available width
+  const spacing = gridWidth / tiles.length;
+  
+  // Position each tile
   for (let i = 0; i < tiles.length; i++) {
-    tiles[i].posX = 50 + i * spacing;
+    // Center the tiles horizontally
+    tiles[i].posX = (i * spacing) + (spacing / 2) - cellSize;
+    tiles[i].posY = startY;
   }
 }
 
@@ -439,16 +505,18 @@ function updateTimer() {
 }
 
 // Calculate and display score and timer
-function displayScoreAndTimer() {
+function updateScoreAndTimerDisplay() {
   let timePenalty = timer > 30 ? Math.floor(timer - 30) * 50 : 0;
   let overPenalty = calculateOverPenalty();
   let currentScore = Math.max(0, score - timePenalty - overPenalty);
+  
+  timeDisplay.textContent = `Time: ${timerStarted ? Math.floor(timer) : 0}s`;
+  scoreDisplay.textContent = `Score: ${currentScore}`;
+}
 
-  fill(0);
-  textSize(16);
-  textAlign(LEFT);
-  text(`Time: ${timerStarted ? Math.floor(timer) : 0}s`, 10, 380);
-  text(`Score: ${currentScore}`, 10, 400);
+// Replace the old displayScoreAndTimer function
+function displayScoreAndTimer() {
+  updateScoreAndTimerDisplay();
 }
 
 // Calculate penalty for covering non-pattern squares
@@ -483,11 +551,6 @@ function checkWinCondition() {
 
 // Display win message and show modal
 function displayWinMessage() {
-  fill(0, 255, 0);
-  textSize(32);
-  textAlign(CENTER);
-  text("You Win!", width / 2, height / 2);
-
   // Calculate final score
   let finalScore = Math.max(
     0,
@@ -496,9 +559,10 @@ function displayWinMessage() {
       calculateOverPenalty()
   );
 
-  // Show win modal
+  // Show win modal with overlay
   finalScoreElement.textContent = finalScore;
   winModal.style.display = "block";
+  modalOverlay.style.display = "block";
 }
 
 // Submit score to Supabase
@@ -569,7 +633,7 @@ async function fetchAndDisplayLeaderboard(playerEmail = null) {
 
     // Create header
     const header = document.createElement("div");
-    header.className = "leaderboard-entry";
+    header.className = "leaderboard-entry leaderboard-header";
     header.innerHTML = `
       <span><strong>Rank</strong></span>
       <span><strong>Initials</strong></span>
@@ -640,13 +704,15 @@ async function fetchAndDisplayLeaderboard(playerEmail = null) {
 // Close leaderboard modal
 function closeLeaderboard() {
   leaderboardModal.style.display = "none";
+  modalOverlay.style.display = "none";
 }
 
 // Reset game
 function resetGame() {
-  // Hide modals
+  // Hide modals and overlay
   winModal.style.display = "none";
   leaderboardModal.style.display = "none";
+  modalOverlay.style.display = "none"; // Make sure overlay is hidden
 
   // Reset game state
   grid = [];
@@ -666,4 +732,15 @@ function resetGame() {
   initializeGrid();
   defineTargetShape();
   defineTiles();
+}
+
+// Add functions for instructions
+function showInstructions() {
+  instructionsModal.style.display = "block";
+  modalOverlay.style.display = "block";
+}
+
+function closeInstructions() {
+  instructionsModal.style.display = "none";
+  modalOverlay.style.display = "none";
 }
