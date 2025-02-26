@@ -239,15 +239,26 @@ function drawTiles() {
   }
 }
 
-// Update the mousePressed function to properly handle rotation
+// Update the mousePressed function to maintain position when rotating
 function mousePressed() {
   if (gameWon) return; // Disable interaction after winning
 
   // Check if it's a right-click (button 2)
   if (mouseButton === RIGHT) {
-    // If a tile is already selected, rotate it
+    // If a tile is already selected, rotate it while maintaining position
     if (selectedTile) {
+      // Get current blocks before rotation
+      const oldBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
+      
+      // Rotate
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
+      
+      // Get new blocks after rotation
+      const newBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
+      
+      // Adjust offset to keep the tile centered under cursor
+      adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
+      
       return false; // Prevent default context menu
     }
     
@@ -770,15 +781,27 @@ function closeInstructions() {
   modalOverlay.style.display = "none";
 }
 
-// Update the keyPressed function to properly handle rotation
+// Update the keyPressed function to use the same adjustment
 function keyPressed() {
   // Check if 'R' key is pressed
   if (key === 'r' || key === 'R') {
     // If a tile is selected, rotate it
     if (selectedTile) {
-      // Update both the selectedTile and the original tile in the tiles array
+      // Get current blocks before rotation
+      const oldBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
+      
+      // Rotate
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
+      
+      // Update the original tile in the tiles array
       tiles[selectedTile.index].rotation = selectedTile.rotation;
+      
+      // Get new blocks after rotation
+      const newBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
+      
+      // Adjust offset to keep the tile centered under cursor
+      adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
+      
       return false; // Prevent default behavior
     }
     
@@ -806,4 +829,29 @@ function keyPressed() {
     }
   }
   return true;
+}
+
+// Add a new function to adjust the offset after rotation
+function adjustOffsetAfterRotation(tile, oldBlocks, newBlocks) {
+  // Calculate the center of the old shape
+  let oldCenterX = 0, oldCenterY = 0;
+  for (let [dx, dy] of oldBlocks) {
+    oldCenterX += dx;
+    oldCenterY += dy;
+  }
+  oldCenterX /= oldBlocks.length;
+  oldCenterY /= oldBlocks.length;
+  
+  // Calculate the center of the new shape
+  let newCenterX = 0, newCenterY = 0;
+  for (let [dx, dy] of newBlocks) {
+    newCenterX += dx;
+    newCenterY += dy;
+  }
+  newCenterX /= newBlocks.length;
+  newCenterY /= newBlocks.length;
+  
+  // Adjust the offset to maintain position
+  tile.offsetX += (newCenterX - oldCenterX) * cellSize;
+  tile.offsetY += (newCenterY - oldCenterY) * cellSize;
 }
