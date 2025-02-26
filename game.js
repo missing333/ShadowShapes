@@ -98,62 +98,77 @@ function defineTargetShape() {
   // Clear the target shape array
   targetShape = [];
 
-  // Define possible patterns for 15x15 grid (centered)
+  // Define possible patterns for 15x15 grid (centered) with at least 18 squares each
   const patterns = [
-    // Cat pattern (centered)
+    // Cat pattern (enhanced)
     [
-      [7, 6], [8, 6], [9, 6], // Head
-      [7, 7], [8, 7], [9, 7], // Body
-      [6, 5], [10, 5], // Ears
-      [8, 8], [8, 9], // Tail
+      [7, 5], [8, 5], [9, 5], // Head top
+      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Head middle
+      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Body upper
+      [7, 8], [8, 8], [9, 8], // Body lower
+      [5, 5], [11, 5], // Ears
+      [7, 9], [8, 9], [9, 9], // Tail
     ],
-    // Heart pattern (centered)
+    // Heart pattern (enhanced)
     [
-      [7, 5], [9, 5], // Top of heart
-      [6, 6], [8, 6], [10, 6], // Middle row
-      [7, 7], [8, 7], [9, 7], // Bottom row
-      [8, 8], // Point
+      [6, 4], [7, 3], [8, 3], [9, 3], [10, 4], // Top of heart
+      [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], // Upper middle
+      [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], // Lower middle
+      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Bottom upper
+      [7, 8], [8, 8], [9, 8], // Bottom middle
+      [8, 9], // Point
     ],
-    // Smiley face (centered)
+    // House pattern (enhanced)
     [
-      [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Top row
-      [5, 6], [11, 6], // Eyes outer
-      [5, 8], [6, 9], [7, 9], [8, 9], [9, 9], [10, 8], // Smile
+      [8, 3], // Roof top
+      [7, 4], [8, 4], [9, 4], // Roof upper
+      [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Roof lower
+      [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], // Upper house
+      [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], // Middle upper house
+      [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], // Middle lower house
+      [5, 9], [6, 9], [7, 9], [8, 9], [9, 9], [10, 9], [11, 9], // Lower house
+      [7, 7], [8, 7], [7, 8], [8, 8], // Door
     ],
-    // House (centered)
+    // Flower pattern (enhanced)
     [
-      [8, 4], // Roof top
-      [7, 5], [8, 5], [9, 5], // Roof
-      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Upper house
-      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Middle house
-      [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], // Lower house
-      [7, 7], [8, 7], // Door
+      [8, 3], // Top petal top
+      [7, 4], [8, 4], [9, 4], // Top petal bottom
+      [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], // Upper middle
+      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Center
+      [7, 7], [8, 7], [9, 7], // Lower middle
+      [8, 8], [8, 9], [8, 10], // Stem
+      [7, 9], [9, 9], // Leaves
     ],
-    // Flower (centered)
+    // Spaceship pattern (enhanced)
     [
-      [8, 5], // Top petal
-      [7, 6], [8, 6], [9, 6], // Middle row
-      [8, 7], // Bottom petal
-      [6, 6], [10, 6], // Side petals
-      [8, 8], [8, 9], // Stem
+      [8, 3], // Top
+      [7, 4], [8, 4], [9, 4], // Upper body
+      [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Middle upper body
+      [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], // Middle body
+      [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], // Lower body
+      [5, 8], [6, 8], [7, 8], [9, 8], [10, 8], [11, 8], // Engines
+      [4, 9], [12, 9], // Engine tips
     ],
-    // Spaceship (centered)
+    // Star pattern (enhanced)
     [
-      [8, 5], // Top
-      [7, 6], [8, 6], [9, 6], // Upper body
-      [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Middle body
+      [8, 2], // Top point
+      [8, 3], [8, 4], // Top connector
+      [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Upper body
+      [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], // Middle upper
+      [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], // Middle
       [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], // Lower body
-      [6, 9], [7, 9], [9, 9], [10, 9], // Engines
+      [4, 9], [12, 9], // Side points
+      [3, 10], [13, 10], // Bottom points
     ],
-    // Star (centered)
+    // Castle pattern (new)
     [
-      [8, 4], // Top point
-      [8, 5], // Top connector
-      [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Upper body
-      [7, 7], [8, 7], [9, 7], // Middle
-      [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], // Lower body
-      [6, 9], [10, 9], // Lower points
-      [5, 10], [11, 10], // Bottom points
+      [5, 3], [8, 3], [11, 3], // Tower tops
+      [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [11, 4], [12, 4], // Upper wall
+      [4, 5], [6, 5], [8, 5], [10, 5], [12, 5], // Battlements
+      [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], [11, 6], [12, 6], // Middle wall
+      [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7], // Lower wall
+      [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], // Base
+      [7, 6], [8, 6], [9, 6], [7, 7], [8, 7], [9, 7], // Door
     ],
   ];
   
@@ -248,30 +263,36 @@ function mousePressed() {
     // If a tile is already selected, rotate it while maintaining position
     if (selectedTile) {
       // Get current blocks before rotation
-      const oldBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
-      
+      const oldBlocks = getRotatedBlocks(
+        selectedTile.blocks,
+        selectedTile.rotation
+      );
+
       // Rotate
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
-      
+
       // Get new blocks after rotation
-      const newBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
-      
+      const newBlocks = getRotatedBlocks(
+        selectedTile.blocks,
+        selectedTile.rotation
+      );
+
       // Adjust offset to keep the tile centered under cursor
       adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
-      
+
       return false; // Prevent default context menu
     }
-    
+
     // If no tile is selected, check if we're hovering over a tile to rotate
     for (let i = 0; i < tiles.length; i++) {
       let tile = tiles[i];
       let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
-      
+
       // Check if mouse is over any block of the tile
       for (let [dx, dy] of rotatedBlocks) {
         let x = tile.posX + dx * cellSize;
         let y = tile.posY + dy * cellSize;
-        
+
         if (
           mouseX > x &&
           mouseX < x + cellSize &&
@@ -285,7 +306,7 @@ function mousePressed() {
       }
     }
   }
-  
+
   for (let i = 0; i < tiles.length; i++) {
     let tile = tiles[i];
     let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
@@ -320,7 +341,7 @@ function drawSelectedTile() {
     selectedTile.blocks,
     selectedTile.rotation
   );
-  
+
   // Draw shadow
   fill(0, 0, 0, 20);
   noStroke();
@@ -333,7 +354,7 @@ function drawSelectedTile() {
       4
     );
   }
-  
+
   // Draw tile
   fill(selectedTile.color);
   stroke(255);
@@ -341,7 +362,7 @@ function drawSelectedTile() {
   for (let [dx, dy] of rotatedBlocks) {
     rect(
       mouseX - selectedTile.offsetX + dx * cellSize,
-         mouseY - selectedTile.offsetY + dy * cellSize, 
+      mouseY - selectedTile.offsetY + dy * cellSize,
       cellSize,
       cellSize,
       4
@@ -374,7 +395,7 @@ function mouseReleased() {
       selectedTile.rotation
     );
     let fits = true;
-    
+
     // Check if tile fits within grid
     for (let [dx, dy] of rotatedBlocks) {
       let newX = gridX + dx;
@@ -390,7 +411,7 @@ function mouseReleased() {
         break;
       }
     }
-    
+
     if (fits) {
       // Place the tile
       for (let [dx, dy] of rotatedBlocks) {
@@ -488,10 +509,10 @@ function addNewTile() {
       color: "#5D9CEC", // Blue
     }, // J-shape
   ];
-  
+
   // Choose a random shape
   const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
-  
+
   // Add the new tile with temporary position
   tiles.push({
     blocks: randomShape.blocks,
@@ -500,7 +521,7 @@ function addNewTile() {
     color: randomShape.color,
     rotation: 0,
   });
-  
+
   // Reposition all tiles
   repositionTiles();
 }
@@ -509,17 +530,17 @@ function addNewTile() {
 function repositionTiles() {
   // Calculate the total width of the grid
   const gridWidth = gridSize * cellSize;
-  
+
   // Calculate the starting Y position (just below the grid)
   const startY = gridSize * cellSize + 20; // 20px padding below grid
-  
+
   // Calculate spacing between tiles based on available width
   const spacing = gridWidth / tiles.length;
-  
+
   // Position each tile
   for (let i = 0; i < tiles.length; i++) {
     // Center the tiles horizontally
-    tiles[i].posX = (i * spacing) + (spacing / 2) - cellSize;
+    tiles[i].posX = i * spacing + spacing / 2 - cellSize;
     tiles[i].posY = startY;
   }
 }
@@ -545,7 +566,7 @@ function updateScoreAndTimerDisplay() {
   let timePenalty = timer > 30 ? Math.floor(timer - 30) * 50 : 0;
   let overPenalty = calculateOverPenalty();
   let currentScore = Math.max(0, score - timePenalty - overPenalty);
-  
+
   timeDisplay.textContent = `Time: ${timerStarted ? Math.floor(timer) : 0}s`;
   scoreDisplay.textContent = `Score: ${currentScore}`;
 }
@@ -784,37 +805,43 @@ function closeInstructions() {
 // Update the keyPressed function to use the same adjustment
 function keyPressed() {
   // Check if 'R' key is pressed
-  if (key === 'r' || key === 'R') {
+  if (key === "r" || key === "R") {
     // If a tile is selected, rotate it
     if (selectedTile) {
       // Get current blocks before rotation
-      const oldBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
-      
+      const oldBlocks = getRotatedBlocks(
+        selectedTile.blocks,
+        selectedTile.rotation
+      );
+
       // Rotate
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
-      
+
       // Update the original tile in the tiles array
       tiles[selectedTile.index].rotation = selectedTile.rotation;
-      
+
       // Get new blocks after rotation
-      const newBlocks = getRotatedBlocks(selectedTile.blocks, selectedTile.rotation);
-      
+      const newBlocks = getRotatedBlocks(
+        selectedTile.blocks,
+        selectedTile.rotation
+      );
+
       // Adjust offset to keep the tile centered under cursor
       adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
-      
+
       return false; // Prevent default behavior
     }
-    
+
     // If no tile is selected, check if we're hovering over a tile to rotate
     for (let i = 0; i < tiles.length; i++) {
       let tile = tiles[i];
       let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
-      
+
       // Check if mouse is over any block of the tile
       for (let [dx, dy] of rotatedBlocks) {
         let x = tile.posX + dx * cellSize;
         let y = tile.posY + dy * cellSize;
-        
+
         if (
           mouseX > x &&
           mouseX < x + cellSize &&
@@ -834,23 +861,25 @@ function keyPressed() {
 // Add a new function to adjust the offset after rotation
 function adjustOffsetAfterRotation(tile, oldBlocks, newBlocks) {
   // Calculate the center of the old shape
-  let oldCenterX = 0, oldCenterY = 0;
+  let oldCenterX = 0,
+    oldCenterY = 0;
   for (let [dx, dy] of oldBlocks) {
     oldCenterX += dx;
     oldCenterY += dy;
   }
   oldCenterX /= oldBlocks.length;
   oldCenterY /= oldBlocks.length;
-  
+
   // Calculate the center of the new shape
-  let newCenterX = 0, newCenterY = 0;
+  let newCenterX = 0,
+    newCenterY = 0;
   for (let [dx, dy] of newBlocks) {
     newCenterX += dx;
     newCenterY += dy;
   }
   newCenterX /= newBlocks.length;
   newCenterY /= newBlocks.length;
-  
+
   // Adjust the offset to maintain position
   tile.offsetX += (newCenterX - oldCenterX) * cellSize;
   tile.offsetY += (newCenterY - oldCenterY) * cellSize;
