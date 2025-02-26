@@ -239,10 +239,42 @@ function drawTiles() {
   }
 }
 
-// Handle tile selection and rotation
+// Update the mousePressed function to properly handle rotation
 function mousePressed() {
   if (gameWon) return; // Disable interaction after winning
 
+  // Check if it's a right-click (button 2)
+  if (mouseButton === RIGHT) {
+    // If a tile is already selected, rotate it
+    if (selectedTile) {
+      selectedTile.rotation = (selectedTile.rotation + 1) % 4;
+      return false; // Prevent default context menu
+    }
+    
+    // If no tile is selected, check if we're hovering over a tile to rotate
+    for (let i = 0; i < tiles.length; i++) {
+      let tile = tiles[i];
+      let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
+      
+      // Check if mouse is over any block of the tile
+      for (let [dx, dy] of rotatedBlocks) {
+        let x = tile.posX + dx * cellSize;
+        let y = tile.posY + dy * cellSize;
+        
+        if (
+          mouseX > x &&
+          mouseX < x + cellSize &&
+          mouseY > y &&
+          mouseY < y + cellSize
+        ) {
+          // Rotate the tile and update the original tile in the tiles array
+          tiles[i].rotation = (tile.rotation + 1) % 4;
+          return false; // Prevent default context menu
+        }
+      }
+    }
+  }
+  
   for (let i = 0; i < tiles.length; i++) {
     let tile = tiles[i];
     let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
@@ -258,21 +290,14 @@ function mousePressed() {
         mouseY > y &&
         mouseY < y + cellSize
       ) {
-        // Right mouse button or key modifier for rotation
-        if (mouseButton === RIGHT) {
-          tile.rotation = (tile.rotation + 1) % 4; // Rotate 90 degrees clockwise
-          return false;
-        }
         // Left mouse button for dragging
-        else {
-          selectedTile = {
-            ...tile,
-            index: i,
-            offsetX: mouseX - tile.posX,
-            offsetY: mouseY - tile.posY,
-          };
-          return false;
-        }
+        selectedTile = {
+          ...tile,
+          index: i,
+          offsetX: mouseX - tile.posX,
+          offsetY: mouseY - tile.posY,
+        };
+        return false;
       }
     }
   }
@@ -305,7 +330,7 @@ function drawSelectedTile() {
   for (let [dx, dy] of rotatedBlocks) {
     rect(
       mouseX - selectedTile.offsetX + dx * cellSize,
-      mouseY - selectedTile.offsetY + dy * cellSize,
+         mouseY - selectedTile.offsetY + dy * cellSize, 
       cellSize,
       cellSize,
       4
@@ -338,7 +363,7 @@ function mouseReleased() {
       selectedTile.rotation
     );
     let fits = true;
-
+    
     // Check if tile fits within grid
     for (let [dx, dy] of rotatedBlocks) {
       let newX = gridX + dx;
@@ -354,7 +379,7 @@ function mouseReleased() {
         break;
       }
     }
-
+    
     if (fits) {
       // Place the tile
       for (let [dx, dy] of rotatedBlocks) {
@@ -743,4 +768,42 @@ function showInstructions() {
 function closeInstructions() {
   instructionsModal.style.display = "none";
   modalOverlay.style.display = "none";
+}
+
+// Update the keyPressed function to properly handle rotation
+function keyPressed() {
+  // Check if 'R' key is pressed
+  if (key === 'r' || key === 'R') {
+    // If a tile is selected, rotate it
+    if (selectedTile) {
+      // Update both the selectedTile and the original tile in the tiles array
+      selectedTile.rotation = (selectedTile.rotation + 1) % 4;
+      tiles[selectedTile.index].rotation = selectedTile.rotation;
+      return false; // Prevent default behavior
+    }
+    
+    // If no tile is selected, check if we're hovering over a tile to rotate
+    for (let i = 0; i < tiles.length; i++) {
+      let tile = tiles[i];
+      let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
+      
+      // Check if mouse is over any block of the tile
+      for (let [dx, dy] of rotatedBlocks) {
+        let x = tile.posX + dx * cellSize;
+        let y = tile.posY + dy * cellSize;
+        
+        if (
+          mouseX > x &&
+          mouseX < x + cellSize &&
+          mouseY > y &&
+          mouseY < y + cellSize
+        ) {
+          // Rotate the tile in the tiles array
+          tiles[i].rotation = (tile.rotation + 1) % 4;
+          return false; // Prevent default behavior
+        }
+      }
+    }
+  }
+  return true;
 }
