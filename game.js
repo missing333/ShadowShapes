@@ -66,6 +66,9 @@ function setup() {
   closeLeaderboardButton.addEventListener("click", closeLeaderboard);
   instructionsButton.addEventListener("click", showInstructions);
   closeInstructionsButton.addEventListener("click", closeInstructions);
+  
+  // Setup modal interactions
+  setupModalInteractions();
 
   initializeGrid();
   defineTargetShape();
@@ -1040,6 +1043,16 @@ function displayWinMessage() {
   finalScoreElement.textContent = finalScore;
   winModal.style.display = "block";
   modalOverlay.style.display = "block";
+  
+  // Prevent immediate closing if user was clicking when they won
+  setTimeout(() => {
+    modalOverlay.addEventListener('click', function checkClick(event) {
+      if (event.target === modalOverlay) {
+        closeAllModals();
+        modalOverlay.removeEventListener('click', checkClick);
+      }
+    });
+  }, 100);
 }
 
 // Submit score to Supabase
@@ -1327,4 +1340,40 @@ function adjustOffsetAfterRotation(tile, oldBlocks, newBlocks) {
   // Adjust the offset to maintain position
   tile.offsetX += (newCenterX - oldCenterX) * cellSize;
   tile.offsetY += (newCenterY - oldCenterY) * cellSize;
+}
+
+// Add event listeners for modal interactions
+function setupModalInteractions() {
+  // Get all modals
+  const modals = [winModal, leaderboardModal, instructionsModal];
+  
+  // Add click event listener to the modal overlay
+  modalOverlay.addEventListener('click', function(event) {
+    // Only close if the click was directly on the overlay (not on modal content)
+    if (event.target === modalOverlay) {
+      closeAllModals();
+    }
+  });
+  
+  // Add keydown event listener for Escape key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+  
+  // Prevent clicks inside modals from closing them
+  modals.forEach(modal => {
+    modal.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+  });
+}
+
+// Function to close all modals
+function closeAllModals() {
+  winModal.style.display = "none";
+  leaderboardModal.style.display = "none";
+  instructionsModal.style.display = "none";
+  modalOverlay.style.display = "none";
 }
