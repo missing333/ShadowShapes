@@ -66,6 +66,9 @@ function setup() {
   closeLeaderboardButton.addEventListener("click", closeLeaderboard);
   instructionsButton.addEventListener("click", showInstructions);
   closeInstructionsButton.addEventListener("click", closeInstructions);
+  
+  // Add click outside to close functionality
+  modalOverlay.addEventListener("click", closeModalsByOverlay);
 
   initializeGrid();
   defineTargetShape();
@@ -1080,4 +1083,23 @@ function adjustOffsetAfterRotation(tile, oldBlocks, newBlocks) {
   // Adjust the offset to maintain position
   tile.offsetX += (newCenterX - oldCenterX) * cellSize;
   tile.offsetY += (newCenterY - oldCenterY) * cellSize;
+}
+
+// Function to close modals when clicking the overlay
+function closeModalsByOverlay(event) {
+  // Only close if the click was directly on the overlay (not on a modal)
+  if (event.target === modalOverlay) {
+    // Close leaderboard if it's open
+    if (leaderboardModal.style.display === "block") {
+      closeLeaderboard();
+    }
+    
+    // Close instructions if it's open
+    if (instructionsModal.style.display === "block") {
+      closeInstructions();
+    }
+    
+    // Don't close the win modal by clicking outside
+    // (we want to ensure players submit their score)
+  }
 }
