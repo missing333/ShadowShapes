@@ -355,9 +355,172 @@ function defineTiles() {
   // Clear the tiles array
   tiles = [];
 
-  // Add 3 random tiles
-  for (let i = 0; i < 3; i++) {
-    addNewTile();
+  // Define all possible tile shapes
+  const allTiles = [
+    // Original 4-block pieces
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1],
+      ],
+      color: "#3498db", // Blue
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [3, 0],
+      ],
+      color: "#e74c3c", // Red
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1],
+      ],
+      color: "#2ecc71", // Green
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [1, 2],
+      ],
+      color: "#f1c40f", // Yellow
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [2, 1],
+      ],
+      color: "#9b59b6", // Purple
+    },
+    {
+      blocks: [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      color: "#e67e22", // Orange
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#1abc9c", // Turquoise
+    },
+    
+    // New 3-block pieces
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+      ],
+      color: "#34495e", // Dark blue/gray
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      color: "#16a085", // Dark green
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+      ],
+      color: "#d35400", // Dark orange
+    },
+    
+    // New 5-block pieces
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [3, 0],
+        [4, 0],
+      ],
+      color: "#8e44ad", // Dark purple
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+      ],
+      color: "#c0392b", // Dark red
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      color: "#27ae60", // Medium green
+    },
+    {
+      blocks: [
+        [2, 0],
+        [2, 1],
+        [0, 2],
+        [1, 2],
+        [2, 2],
+      ],
+      color: "#f39c12", // Gold
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#7f8c8d", // Gray
+    },
+  ];
+
+  // Randomly select 3 tiles from the available options
+  const selectedIndices = [];
+  while (selectedIndices.length < 3) {
+    const randomIndex = Math.floor(Math.random() * allTiles.length);
+    if (!selectedIndices.includes(randomIndex)) {
+      selectedIndices.push(randomIndex);
+    }
+  }
+
+  // Create the selected tiles
+  for (const index of selectedIndices) {
+    const tileTemplate = allTiles[index];
+    tiles.push({
+      blocks: [...tileTemplate.blocks], // Clone the blocks array
+      color: tileTemplate.color,
+      offsetX: 0,
+      offsetY: 0,
+      placed: false,
+      rotation: 0,
+    });
   }
 
   // Position them evenly
@@ -614,37 +777,20 @@ function mouseReleased() {
   }
 }
 
-// Add a new random tile to replace the used one
+// Add a new tile to replace a used one
 function addNewTile() {
-  // Define possible shapes
-  const shapes = [
-    {
-      blocks: [
-        [0, 0],
-        [0, 1],
-        [0, 2],
-        [1, 2],
-      ],
-      color: "#FF6B6B", // Coral red
-    }, // L-shape
+  // Define all possible tile shapes
+  const allTiles = [
+    // Original 4-block pieces
     {
       blocks: [
         [0, 0],
         [1, 0],
-        [2, 0],
-        [1, 1],
-      ],
-      color: "#4FC1E9", // Sky blue
-    }, // T-shape
-    {
-      blocks: [
-        [0, 0],
         [0, 1],
-        [1, 0],
         [1, 1],
       ],
-      color: "#FFCE54", // Soft yellow
-    }, // Square
+      color: "#3498db", // Blue
+    },
     {
       blocks: [
         [0, 0],
@@ -652,8 +798,26 @@ function addNewTile() {
         [2, 0],
         [3, 0],
       ],
-      color: "#A0D468", // Lime green
-    }, // I-shape
+      color: "#e74c3c", // Red
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1],
+      ],
+      color: "#2ecc71", // Green
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [1, 2],
+      ],
+      color: "#f1c40f", // Yellow
+    },
     {
       blocks: [
         [0, 0],
@@ -661,40 +825,123 @@ function addNewTile() {
         [1, 1],
         [2, 1],
       ],
-      color: "#AC92EC", // Lavender
-    }, // Z-shape
+      color: "#9b59b6", // Purple
+    },
     {
       blocks: [
         [1, 0],
         [0, 1],
         [1, 1],
-        [2, 0],
+        [2, 1],
       ],
-      color: "#EC87C0", // Pink
-    }, // S-shape
+      color: "#e67e22", // Orange
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#1abc9c", // Turquoise
+    },
+    
+    // New 3-block pieces
     {
       blocks: [
         [0, 0],
         [1, 0],
         [2, 0],
-        [0, 1],
       ],
-      color: "#5D9CEC", // Blue
-    }, // J-shape
+      color: "#34495e", // Dark blue/gray
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+      ],
+      color: "#16a085", // Dark green
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+      ],
+      color: "#d35400", // Dark orange
+    },
+    
+    // New 5-block pieces
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [3, 0],
+        [4, 0],
+      ],
+      color: "#8e44ad", // Dark purple
+    },
+    {
+      blocks: [
+        [0, 0],
+        [0, 1],
+        [0, 2],
+        [0, 3],
+        [0, 4],
+      ],
+      color: "#c0392b", // Dark red
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ],
+      color: "#27ae60", // Medium green
+    },
+    {
+      blocks: [
+        [2, 0],
+        [2, 1],
+        [0, 2],
+        [1, 2],
+        [2, 2],
+      ],
+      color: "#f39c12", // Gold
+    },
+    {
+      blocks: [
+        [0, 0],
+        [1, 0],
+        [2, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      color: "#7f8c8d", // Gray
+    },
   ];
 
-  // Choose a random shape
-  const randomShape = shapes[Math.floor(Math.random() * shapes.length)];
+  // Choose a random tile shape
+  const randomIndex = Math.floor(Math.random() * allTiles.length);
+  const tileShape = allTiles[randomIndex];
 
-  // Add the new tile with temporary position
-  tiles.push({
-    blocks: randomShape.blocks,
-    posX: 0, // Will be updated by repositionTiles
-    posY: gridSize * cellSize + 20, // Just below the grid
-    color: randomShape.color,
+  // Create a new tile
+  const newTile = {
+    blocks: [...tileShape.blocks], // Clone the blocks array
+    color: tileShape.color,
+    offsetX: 0,
+    offsetY: 0,
+    placed: false,
     rotation: 0,
-  });
+  };
 
+  // Add the new tile to the tiles array
+  tiles.push(newTile);
+  
   // Reposition all tiles
   repositionTiles();
 }
