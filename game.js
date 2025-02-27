@@ -9,6 +9,10 @@ let timerStarted = false; // Tracks if timer should run
 let score = 10000; // Starting score
 let gameWon = false; // Win state
 
+// Global variables to store the selected animal and its colors
+let selectedAnimal = null;
+let animalColors = null;
+
 // Supabase configuration
 const SUPABASE_URL = "https://nwqbnjbhvuhuushsknrf.supabase.co";
 const SUPABASE_KEY =
@@ -101,256 +105,72 @@ function defineTargetShape() {
   // Clear the target shape array
   targetShape = [];
 
-  // Define possible patterns for 15x15 grid (centered) with at least 18 squares each
-  const patterns = [
-    // Cat pattern (enhanced)
-    [
-      [7, 5],
-      [8, 5],
-      [9, 5], // Head top
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6], // Head middle
-      [6, 7],
-      [7, 7],
-      [8, 7],
-      [9, 7],
-      [10, 7], // Body upper
-      [7, 8],
-      [8, 8],
-      [9, 8], // Body lower
-      [5, 5],
-      [11, 5], // Ears
-      [7, 9],
-      [8, 9],
-      [9, 9], // Tail
-    ],
-    // Heart pattern (enhanced)
-    [
-      [6, 4],
-      [7, 3],
-      [8, 3],
-      [9, 3],
-      [10, 4], // Top of heart
-      [5, 5],
-      [6, 5],
-      [7, 5],
-      [8, 5],
-      [9, 5],
-      [10, 5],
-      [11, 5], // Upper middle
-      [5, 6],
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6],
-      [11, 6], // Lower middle
-      [6, 7],
-      [7, 7],
-      [8, 7],
-      [9, 7],
-      [10, 7], // Bottom upper
-      [7, 8],
-      [8, 8],
-      [9, 8], // Bottom middle
-      [8, 9], // Point
-    ],
-    // House pattern (enhanced)
-    [
-      [8, 3], // Roof top
-      [7, 4],
-      [8, 4],
-      [9, 4], // Roof upper
-      [6, 5],
-      [7, 5],
-      [8, 5],
-      [9, 5],
-      [10, 5], // Roof lower
-      [5, 6],
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6],
-      [11, 6], // Upper house
-      [5, 7],
-      [6, 7],
-      [9, 7],
-      [10, 7],
-      [11, 7], // Middle upper house
-      [5, 8],
-      [6, 8],
-      [7, 8],
-      [8, 8],
-      [9, 8],
-      [10, 8],
-      [11, 8], // Middle lower house
-      [5, 9],
-      [6, 9],
-      [7, 9],
-      [8, 9],
-      [9, 9],
-      [10, 9],
-      [11, 9], // Lower house
-      [7, 7],
-      [8, 7], // Door
-    ],
-    // Flower pattern (enhanced)
-    [
-      [8, 3], // Top petal top
-      [7, 4],
-      [8, 4],
-      [9, 4], // Top petal bottom
-      [5, 5],
-      [6, 5],
-      [7, 5],
-      [8, 5],
-      [9, 5],
-      [10, 5],
-      [11, 5], // Upper middle
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6], // Center
-      [7, 7],
-      [8, 7],
-      [9, 7], // Lower middle
-      [8, 8],
-      [8, 9],
-      [8, 10], // Stem
-      [7, 9],
-      [9, 9], // Leaves
-    ],
-    // Spaceship pattern (enhanced)
-    [
-      [8, 3], // Top
-      [7, 4],
-      [8, 4],
-      [9, 4], // Upper body
-      [6, 5],
-      [7, 5],
-      [8, 5],
-      [9, 5],
-      [10, 5], // Middle upper body
-      [5, 6],
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6],
-      [11, 6], // Middle body
-      [4, 7],
-      [5, 7],
-      [6, 7],
-      [7, 7],
-      [8, 7],
-      [9, 7],
-      [10, 7],
-      [11, 7],
-      [12, 7], // Lower body
-      [5, 8],
-      [6, 8],
-      [7, 8],
-      [9, 8],
-      [10, 8],
-      [11, 8], // Engines
-      [4, 9],
-      [12, 9], // Engine tips
-    ],
-    // Star pattern (enhanced)
-    [
-      [8, 2], // Top point
-      [8, 3],
-      [8, 4], // Top connector
-      [6, 5],
-      [7, 5],
-      [8, 5],
-      [9, 5],
-      [10, 5], // Upper body
-      [5, 6],
-      [6, 6],
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [10, 6],
-      [11, 6], // Middle upper
-      [4, 7],
-      [5, 7],
-      [6, 7],
-      [7, 7],
-      [8, 7],
-      [9, 7],
-      [10, 7],
-      [11, 7],
-      [12, 7], // Middle
-      [5, 8],
-      [6, 8],
-      [7, 8],
-      [8, 8],
-      [9, 8],
-      [10, 8],
-      [11, 8], // Lower body
-      [4, 9],
-      [12, 9], // Side points
-      [3, 10],
-      [13, 10], // Bottom points
-    ],
-    // Castle pattern (new)
-    [
-      [5, 3],
-      [8, 3],
-      [11, 3], // Tower tops
-      [4, 4],
-      [5, 4],
-      [6, 4],
-      [7, 4],
-      [8, 4],
-      [9, 4],
-      [10, 4],
-      [11, 4],
-      [12, 4], // Upper wall
-      [4, 5],
-      [6, 5],
-      [8, 5],
-      [10, 5],
-      [12, 5], // Battlements
-      [4, 6],
-      [5, 6],
-      [6, 6],
-      [10, 6],
-      [11, 6],
-      [12, 6], // Middle wall
-      [4, 7],
-      [5, 7],
-      [6, 7],
-      [10, 7],
-      [11, 7],
-      [12, 7], // Lower wall
-      [4, 8],
-      [5, 8],
-      [6, 8],
-      [7, 8],
-      [8, 8],
-      [9, 8],
-      [10, 8],
-      [11, 8],
-      [12, 8], // Base
-      [7, 6],
-      [8, 6],
-      [9, 6],
-      [7, 7],
-      [8, 7],
-      [9, 7], // Door
-    ],
+  // Define animal patterns with their names and colors
+  const animalPatterns = [
+    {
+      name: "Cat",
+      colors: ["#2c3e50", "#34495e", "#ecf0f1", "#f39c12"], // Dark body, lighter details, white face, orange eyes
+      pattern: [
+        [5, 1], [8, 1], // Ear tips
+        [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], // Head top with ears
+        [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], // Head middle
+        [5, 4], [6, 4], [7, 4], [8, 4], // Head bottom
+        [6, 5], [7, 5], // Neck
+        [5, 6], [6, 6], [7, 6], [8, 6], // Body top
+        [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], // Body middle
+        [3, 8], [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], // Body bottom
+        [3, 9], [4, 9], [9, 9], [10, 9], // Legs top
+        [2, 10], [4, 10], [9, 10], [11, 10], // Paws
+        [6, 8], [7, 8], [6, 9], [7, 9], // Tail base
+        [7, 10], [8, 10], // Tail end
+      ]
+    },
+    {
+      name: "Shark",
+      colors: ["#3498db", "#2980b9", "#bdc3c7", "#e74c3c"], // Blue body, dark blue details, white teeth, red fin
+      pattern: [
+        [10, 2], // Fin tip
+        [9, 3], [10, 3], // Fin top
+        [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], // Head top
+        [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Head with fin
+        [2, 6], [3, 6], [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Body top
+        [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], // Body middle
+        [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], // Body bottom
+        [5, 9], [6, 9], [7, 9], // Tail base
+        [4, 10], [8, 10], // Tail fins
+      ]
+    },
+    {
+      name: "Rabbit",
+      colors: ["#bdc3c7", "#ecf0f1", "#95a5a6", "#7f8c8d"], // Light gray body, white ears, gray feet
+      pattern: [
+        [6, 1], [9, 1], // Ear tips
+        [6, 2], [7, 2], [8, 2], [9, 2], // Ears
+        [7, 3], [8, 3], // Head top
+        [6, 4], [7, 4], [8, 4], [9, 4], // Head
+        [6, 5], [7, 5], [8, 5], [9, 5], // Upper body
+        [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6], // Middle body
+        [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], // Lower body
+        [6, 8], [7, 8], [8, 8], [9, 8], // Bottom
+        [6, 9], [9, 9], // Feet
+      ]
+    }
   ];
 
-  // Choose a random pattern
-  const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
-  targetShape = randomPattern;
+  // Choose a random animal pattern
+  const randomIndex = Math.floor(Math.random() * animalPatterns.length);
+  const selectedPattern = animalPatterns[randomIndex];
+  
+  // Store the selected animal name and colors globally
+  selectedAnimal = selectedPattern.name;
+  animalColors = selectedPattern.colors;
+  
+  // Set the target shape to the selected pattern
+  targetShape = selectedPattern.pattern;
+  
+  // Log the selected animal for debugging
+  console.log("Selected animal:", selectedAnimal);
+  console.log("Animal colors:", animalColors);
 }
 
 // Define 3 random Tetris tiles with shapes, positions, and colors
@@ -550,12 +370,17 @@ function drawGrid() {
   }
 }
 
-// Draw the faint target shape (cat)
+// Draw the target shape (outline)
 function drawTargetShape() {
-  noStroke();
-  fill(100, 120, 200, 80); // Soft blue with transparency
+  // Use a consistent color scheme for the target shape
+  const targetColor = color(200, 200, 200, 150); // Light gray with transparency
+  const targetStrokeColor = color(150, 150, 150); // Darker gray for outline
+  
   for (let [x, y] of targetShape) {
-    rect(x * cellSize, y * cellSize, cellSize, cellSize, 2); // Slightly rounded corners
+    fill(targetColor);
+    stroke(targetStrokeColor);
+    strokeWeight(1);
+    rect(x * cellSize, y * cellSize, cellSize, cellSize);
   }
 }
 
@@ -1029,7 +854,7 @@ function checkWinCondition() {
   }
 }
 
-// Display win message and show modal
+// Display win message and show the completed animal shape
 function displayWinMessage() {
   // Calculate final score
   let finalScore = Math.max(
@@ -1039,10 +864,35 @@ function displayWinMessage() {
       calculateOverPenalty()
   );
 
+  // Create the completed animal shape with the current animal's colors
+  const completedShapeCanvas = drawCompletedShape();
+  
+  // Clear any previous animal display
+  const previousAnimal = document.getElementById("completed-animal-win");
+  if (previousAnimal) {
+    previousAnimal.remove();
+  }
+  
+  // Add ID to the canvas for easy reference
+  completedShapeCanvas.id = "completed-animal-win";
+  
+  // Find the win modal title
+  const winModalTitle = winModal.querySelector("h2");
+  
+  // Insert the canvas after the title
+  winModalTitle.insertAdjacentElement('afterend', completedShapeCanvas);
+  
+  // Update the win modal title to include the animal name
+  winModalTitle.textContent = `${selectedAnimal} Completed!`;
+
   // Show win modal with overlay
   finalScoreElement.textContent = finalScore;
   winModal.style.display = "block";
   modalOverlay.style.display = "block";
+  
+  // Log the animal and colors for debugging
+  console.log("Win modal - Animal:", selectedAnimal);
+  console.log("Win modal - Colors:", animalColors);
   
   // Prevent immediate closing if user was clicking when they won
   setTimeout(() => {
@@ -1055,50 +905,59 @@ function displayWinMessage() {
   }, 100);
 }
 
-// Submit score to Supabase
+// Submit score to leaderboard
 async function submitScore() {
   const initials = playerInitialsInput.value.toUpperCase();
   const email = playerEmailInput.value;
 
-  if (!initials || !email || initials.length > 3) {
-    alert("Please enter valid initials (max 3 letters) and email");
+  // Validate inputs
+  if (!initials || initials.length > 3) {
+    alert("Please enter 1-3 letters for your initials.");
     return;
   }
 
-  const finalScore = parseInt(finalScoreElement.textContent);
+  if (!email || !email.includes("@")) {
+    alert("Please enter a valid email address.");
+    return;
+  }
+
+  // Calculate final score
+  let finalScore = Math.max(
+    0,
+    score -
+      (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
+      calculateOverPenalty()
+  );
 
   // Show loading state
   submitScoreButton.textContent = "Submitting...";
   submitScoreButton.disabled = true;
 
   try {
-    console.log("Submitting score:", { initials, email, score: finalScore });
-
     // Insert score into Supabase
     const { data, error } = await supabase.from("leaderboard").insert([
       {
         initials: initials,
-        email: email,
         score: finalScore,
-        pattern: JSON.stringify(targetShape), // Convert array to JSON string
-        time_taken: Math.floor(timer),
+        email: email,
+        animal: selectedAnimal // Store the animal type
       },
     ]);
 
-    if (error) {
-      console.error("Supabase error:", error);
-      throw error;
-    }
-
-    console.log("Score submitted successfully:", data);
+    if (error) throw error;
 
     // Hide win modal and show leaderboard
     winModal.style.display = "none";
-    await fetchAndDisplayLeaderboard(email);
+    
+    // Fetch and display leaderboard
+    await fetchLeaderboard(email);
+    
+    // Show leaderboard modal
     leaderboardModal.style.display = "block";
+    modalOverlay.style.display = "block";
   } catch (error) {
     console.error("Error submitting score:", error);
-    alert("Error submitting score: " + error.message);
+    alert("Error submitting score. Please try again.");
   } finally {
     // Reset button state
     submitScoreButton.textContent = "Submit Score";
@@ -1106,109 +965,131 @@ async function submitScore() {
   }
 }
 
-// Fetch and display leaderboard
-async function fetchAndDisplayLeaderboard(playerEmail = null) {
+// Fetch leaderboard data from Supabase
+async function fetchLeaderboard(playerEmail = null) {
   try {
-    // Get today's date in ISO format (YYYY-MM-DD)
-    const today = new Date().toISOString().split('T')[0];
-    
-    // Get top 10 scores from today
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+
+    // Fetch top 10 scores for today
     const { data, error } = await supabase
       .from("leaderboard")
       .select("*")
-      .gte('created_at', today) // Filter for entries created today or later
-      .lt('created_at', today + 'T23:59:59') // Before end of today
+      .gte('created_at', today)
+      .lt('created_at', today + 'T23:59:59')
       .order("score", { ascending: false })
       .limit(10);
 
     if (error) throw error;
 
-    // Clear existing entries
+    // Clear previous entries
     leaderboardEntriesElement.innerHTML = "";
 
-    // Create header
+    // Create a header for the leaderboard
     const header = document.createElement("div");
-    header.className = "leaderboard-entry leaderboard-header";
+    header.className = "leaderboard-header";
     header.innerHTML = `
-      <span><strong>Rank</strong></span>
-      <span><strong>Initials</strong></span>
-      <span><strong>Score</strong></span>
+      <span>Rank</span>
+      <span>Player</span>
+      <span>Animal</span>
+      <span>Score</span>
     `;
     leaderboardEntriesElement.appendChild(header);
 
-    // Add entries
+    // Add the completed animal shape to the leaderboard modal
+    const completedShapeCanvas = drawCompletedShape();
+    
+    // Clear any previous animal display
+    const previousAnimal = document.getElementById("completed-animal-leaderboard");
+    if (previousAnimal) {
+      previousAnimal.remove();
+    }
+    
+    // Add ID to the canvas for easy reference
+    completedShapeCanvas.id = "completed-animal-leaderboard";
+    
+    // Find the leaderboard modal title
+    const leaderboardTitle = document.querySelector("#leaderboard-modal h2");
+    
+    // Insert the canvas after the title
+    leaderboardTitle.insertAdjacentElement('afterend', completedShapeCanvas);
+    
+    // Update the leaderboard title to include the animal name
+    leaderboardTitle.textContent = `Today's ${selectedAnimal} Leaderboard`;
+
+    // Reset current player rank
+    currentPlayerRank = null;
+
+    // Display leaderboard entries
     if (data.length === 0) {
-      // No scores today yet
-      const noScoresMsg = document.createElement("div");
-      noScoresMsg.className = "leaderboard-entry";
-      noScoresMsg.innerHTML = `<span colspan="3" style="text-align: center">No scores recorded today yet!</span>`;
-      leaderboardEntriesElement.appendChild(noScoresMsg);
+      const noEntries = document.createElement("div");
+      noEntries.className = "no-entries";
+      noEntries.textContent = "No scores yet today. Be the first!";
+      leaderboardEntriesElement.appendChild(noEntries);
     } else {
       data.forEach((entry, index) => {
-        const entryElement = document.createElement("div");
-        entryElement.className = "leaderboard-entry";
-
-        // Highlight player's entry
-        if (playerEmail && entry.email === playerEmail) {
-          entryElement.classList.add("highlight");
-          currentPlayerRank = index + 1;
+        const rank = index + 1;
+        
+        // Check if this is the current player's entry
+        const isCurrentPlayer = playerEmail && entry.email === playerEmail;
+        if (isCurrentPlayer) {
+          currentPlayerRank = rank;
         }
-
+        
+        const entryElement = document.createElement("div");
+        entryElement.className = `leaderboard-entry${isCurrentPlayer ? " highlight" : ""}`;
         entryElement.innerHTML = `
-          <span>${index + 1}</span>
+          <span>${rank}</span>
           <span>${entry.initials}</span>
+          <span>${entry.animal || "Unknown"}</span>
           <span>${entry.score}</span>
         `;
-
         leaderboardEntriesElement.appendChild(entryElement);
       });
-    }
-
-    // Show player's rank if they're not in top 10
-    if (playerEmail && !currentPlayerRank && data.length > 0) {
-      const { data: playerData, error: playerError } = await supabase
-        .from("leaderboard")
-        .select("*")
-        .eq("email", playerEmail)
-        .gte('created_at', today)
-        .lt('created_at', today + 'T23:59:59')
-        .single();
-
-      if (!playerError && playerData) {
-        // Get player's rank
-        const { count, error: countError } = await supabase
+      
+      // If player is not in top 10 but we have their email, fetch their rank
+      if (playerEmail && !currentPlayerRank) {
+        const { data: playerData, error: playerError } = await supabase
           .from("leaderboard")
-          .select("*", { count: "exact", head: true })
-          .gt("score", playerData.score)
+          .select("*")
+          .eq("email", playerEmail)
           .gte('created_at', today)
-          .lt('created_at', today + 'T23:59:59');
+          .lt('created_at', today + 'T23:59:59')
+          .order("created_at", { ascending: false })
+          .limit(1);
+          
+        if (!playerError && playerData.length > 0) {
+          // Get player's rank
+          const { count, error: countError } = await supabase
+            .from("leaderboard")
+            .select("*", { count: "exact", head: true })
+            .gte('created_at', today)
+            .lt('created_at', today + 'T23:59:59')
+            .gt("score", playerData[0].score);
+            
+          if (!countError) {
+            const playerRank = count + 1;
+            
+            // Add separator
+            const separator = document.createElement("div");
+            separator.className = "leaderboard-separator";
+            separator.innerHTML = "...";
+            separator.style.textAlign = "center";
+            leaderboardEntriesElement.appendChild(separator);
 
-        if (!countError) {
-          const playerRank = count + 1;
-
-          const separator = document.createElement("div");
-          separator.innerHTML = "...";
-          separator.style.textAlign = "center";
-          leaderboardEntriesElement.appendChild(separator);
-
-          const playerEntry = document.createElement("div");
-          playerEntry.className = "leaderboard-entry highlight";
-          playerEntry.innerHTML = `
-            <span>${playerRank}</span>
-            <span>${playerData.initials}</span>
-            <span>${playerData.score}</span>
-          `;
-          leaderboardEntriesElement.appendChild(playerEntry);
+            const playerEntry = document.createElement("div");
+            playerEntry.className = "leaderboard-entry highlight";
+            playerEntry.innerHTML = `
+              <span>${playerRank}</span>
+              <span>${playerData[0].initials}</span>
+              <span>${playerData[0].animal || "Unknown"}</span>
+              <span>${playerData[0].score}</span>
+            `;
+            leaderboardEntriesElement.appendChild(playerEntry);
+          }
         }
       }
     }
-    
-    // Add a title to indicate these are today's scores
-    const leaderboardTitle = document.querySelector("#leaderboard-modal h2");
-    if (leaderboardTitle) {
-      leaderboardTitle.textContent = "Today's Leaderboard";
-    }
-    
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     leaderboardEntriesElement.innerHTML = "<p>Error loading leaderboard</p>";
@@ -1376,4 +1257,139 @@ function closeAllModals() {
   leaderboardModal.style.display = "none";
   instructionsModal.style.display = "none";
   modalOverlay.style.display = "none";
+}
+
+// Draw the completed shape with animal-appropriate colors
+function drawCompletedShape() {
+  // Create a new canvas element for the completed shape
+  const completedShapeCanvas = document.createElement('canvas');
+  const shapeSize = 150; // Size of the mini display
+  completedShapeCanvas.width = shapeSize;
+  completedShapeCanvas.height = shapeSize;
+  completedShapeCanvas.style.display = 'block';
+  completedShapeCanvas.style.margin = '0 auto 20px auto';
+  completedShapeCanvas.style.borderRadius = '8px';
+  completedShapeCanvas.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+  
+  // Get the 2D context for drawing
+  const ctx = completedShapeCanvas.getContext('2d');
+  
+  // Find the bounds of the target shape to center it
+  let minX = gridSize, minY = gridSize, maxX = 0, maxY = 0;
+  for (let [x, y] of targetShape) {
+    minX = Math.min(minX, x);
+    minY = Math.min(minY, y);
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  }
+  
+  // Calculate the width and height of the shape
+  const shapeWidth = maxX - minX + 1;
+  const shapeHeight = maxY - minY + 1;
+  
+  // Calculate the cell size to fit the shape in the canvas
+  const cellSizeMini = Math.min(
+    shapeSize / shapeWidth,
+    shapeSize / shapeHeight
+  ) * 0.9; // 90% to add some margin
+  
+  // Calculate the offset to center the shape
+  const offsetX = (shapeSize - shapeWidth * cellSizeMini) / 2;
+  const offsetY = (shapeSize - shapeHeight * cellSizeMini) / 2;
+  
+  // Fill the background
+  ctx.fillStyle = '#f0f4f8';
+  ctx.fillRect(0, 0, shapeSize, shapeSize);
+  
+  // Add a title with the animal name
+  ctx.fillStyle = '#2c3e50';
+  ctx.font = 'bold 14px Arial';
+  ctx.textAlign = 'center';
+  ctx.fillText(selectedAnimal, shapeSize/2, 15);
+  
+  // Create a color mapping for this specific animal
+  const colorMapping = {};
+  
+  // Apply specific coloring rules based on the animal type
+  if (selectedAnimal === "Cat") {
+    // Color the cat: dark body, white face, orange eyes, lighter details
+    for (let [x, y] of targetShape) {
+      if (y >= 3 && y <= 5 && x >= 6 && x <= 7) { // Face center
+        colorMapping[`${x},${y}`] = 2; // White face
+      } else if ((x === 6 && y === 3) || (x === 7 && y === 3)) { // Eyes
+        colorMapping[`${x},${y}`] = 3; // Orange eyes
+      } else if (y >= 9 && y <= 10) { // Legs and tail
+        colorMapping[`${x},${y}`] = 1; // Lighter details
+      } else {
+        colorMapping[`${x},${y}`] = 0; // Dark body (default)
+      }
+    }
+  } else if (selectedAnimal === "Shark") {
+    // Color the shark: blue body, dark blue details, white teeth, red fin
+    for (let [x, y] of targetShape) {
+      if (y <= 3 || x >= 9 && y <= 6) { // Fin
+        colorMapping[`${x},${y}`] = 3; // Red fin
+      } else if (y === 5 && (x === 5 || x === 6 || x === 7)) { // Teeth
+        colorMapping[`${x},${y}`] = 2; // White teeth
+      } else if (x <= 3 || x >= 9 || y >= 9) { // Details
+        colorMapping[`${x},${y}`] = 1; // Dark blue details
+      } else {
+        colorMapping[`${x},${y}`] = 0; // Blue body (default)
+      }
+    }
+  } else if (selectedAnimal === "Rabbit") {
+    // Color the rabbit: body light gray, ears white, feet dark gray
+    for (let [x, y] of targetShape) {
+      if (y <= 3) { // Ears
+        colorMapping[`${x},${y}`] = 1; // White ears
+      } else if (y >= 9) { // Feet
+        colorMapping[`${x},${y}`] = 3; // Dark gray feet
+      } else if (y >= 4 && y <= 5 && x >= 7 && x <= 8) { // Face
+        colorMapping[`${x},${y}`] = 1; // White face
+      } else {
+        colorMapping[`${x},${y}`] = 0; // Light gray body (default)
+      }
+    }
+  } else {
+    // Default coloring if animal type is not recognized
+    for (let [x, y] of targetShape) {
+      colorMapping[`${x},${y}`] = 0; // Use first color for everything
+    }
+  }
+  
+  // Draw each cell of the completed shape with appropriate colors
+  for (let [x, y] of targetShape) {
+    // Get the color from the mapping
+    const colorIndex = colorMapping[`${x},${y}`] || 0;
+    const fillColor = animalColors[colorIndex];
+    
+    // Calculate position
+    const drawX = offsetX + (x - minX) * cellSizeMini;
+    const drawY = offsetY + (y - minY) * cellSizeMini;
+    
+    // Draw rounded rectangle
+    ctx.beginPath();
+    const radius = 3;
+    ctx.moveTo(drawX + radius, drawY);
+    ctx.lineTo(drawX + cellSizeMini - radius, drawY);
+    ctx.arcTo(drawX + cellSizeMini, drawY, drawX + cellSizeMini, drawY + radius, radius);
+    ctx.lineTo(drawX + cellSizeMini, drawY + cellSizeMini - radius);
+    ctx.arcTo(drawX + cellSizeMini, drawY + cellSizeMini, drawX + cellSizeMini - radius, drawY + cellSizeMini, radius);
+    ctx.lineTo(drawX + radius, drawY + cellSizeMini);
+    ctx.arcTo(drawX, drawY + cellSizeMini, drawX, drawY + cellSizeMini - radius, radius);
+    ctx.lineTo(drawX, drawY + radius);
+    ctx.arcTo(drawX, drawY, drawX + radius, drawY, radius);
+    ctx.closePath();
+    
+    // Set fill and stroke styles
+    ctx.fillStyle = fillColor;
+    ctx.strokeStyle = '#333333'; // Darker outline for better visibility
+    ctx.lineWidth = 1;
+    
+    // Apply fill and stroke
+    ctx.fill();
+    ctx.stroke();
+  }
+  
+  return completedShapeCanvas;
 }
