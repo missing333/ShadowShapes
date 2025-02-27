@@ -849,10 +849,15 @@ async function submitScore() {
 // Fetch and display leaderboard
 async function fetchAndDisplayLeaderboard(playerEmail = null) {
   try {
-    // Get top 10 scores
+    // Get today's date in ISO format (YYYY-MM-DD)
+    const today = new Date().toISOString().split('T')[0];
+    
+    // Get top 10 scores from today
     const { data, error } = await supabase
       .from("leaderboard")
       .select("*")
+      .gte('created_at', today) // Filter for entries created today or later
+      .lt('created_at', today + 'T23:59:59') // Before end of today
       .order("score", { ascending: false })
       .limit(10);
 
@@ -872,31 +877,41 @@ async function fetchAndDisplayLeaderboard(playerEmail = null) {
     leaderboardEntriesElement.appendChild(header);
 
     // Add entries
-    data.forEach((entry, index) => {
-      const entryElement = document.createElement("div");
-      entryElement.className = "leaderboard-entry";
+    if (data.length === 0) {
+      // No scores today yet
+      const noScoresMsg = document.createElement("div");
+      noScoresMsg.className = "leaderboard-entry";
+      noScoresMsg.innerHTML = `<span colspan="3" style="text-align: center">No scores recorded today yet!</span>`;
+      leaderboardEntriesElement.appendChild(noScoresMsg);
+    } else {
+      data.forEach((entry, index) => {
+        const entryElement = document.createElement("div");
+        entryElement.className = "leaderboard-entry";
 
-      // Highlight player's entry
-      if (playerEmail && entry.email === playerEmail) {
-        entryElement.classList.add("highlight");
-        currentPlayerRank = index + 1;
-      }
+        // Highlight player's entry
+        if (playerEmail && entry.email === playerEmail) {
+          entryElement.classList.add("highlight");
+          currentPlayerRank = index + 1;
+        }
 
-      entryElement.innerHTML = `
-        <span>${index + 1}</span>
-        <span>${entry.initials}</span>
-        <span>${entry.score}</span>
-      `;
+        entryElement.innerHTML = `
+          <span>${index + 1}</span>
+          <span>${entry.initials}</span>
+          <span>${entry.score}</span>
+        `;
 
-      leaderboardEntriesElement.appendChild(entryElement);
-    });
+        leaderboardEntriesElement.appendChild(entryElement);
+      });
+    }
 
     // Show player's rank if they're not in top 10
-    if (playerEmail && !currentPlayerRank) {
+    if (playerEmail && !currentPlayerRank && data.length > 0) {
       const { data: playerData, error: playerError } = await supabase
         .from("leaderboard")
         .select("*")
         .eq("email", playerEmail)
+        .gte('created_at', today)
+        .lt('created_at', today + 'T23:59:59')
         .single();
 
       if (!playerError && playerData) {
@@ -904,7 +919,9 @@ async function fetchAndDisplayLeaderboard(playerEmail = null) {
         const { count, error: countError } = await supabase
           .from("leaderboard")
           .select("*", { count: "exact", head: true })
-          .gt("score", playerData.score);
+          .gt("score", playerData.score)
+          .gte('created_at', today)
+          .lt('created_at', today + 'T23:59:59');
 
         if (!countError) {
           const playerRank = count + 1;
@@ -925,6 +942,13 @@ async function fetchAndDisplayLeaderboard(playerEmail = null) {
         }
       }
     }
+    
+    // Add a title to indicate these are today's scores
+    const leaderboardTitle = document.querySelector("#leaderboard-modal h2");
+    if (leaderboardTitle) {
+      leaderboardTitle.textContent = "Today's Leaderboard";
+    }
+    
   } catch (error) {
     console.error("Error fetching leaderboard:", error);
     leaderboardEntriesElement.innerHTML = "<p>Error loading leaderboard</p>";
