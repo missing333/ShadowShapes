@@ -89,6 +89,8 @@ function draw() {
   updateTimer();
   updateScoreAndTimerDisplay();
   if (gameWon) displayWinMessage();
+
+  displayWinMessage();
 }
 
 // Initialize the grid (all cells empty)
