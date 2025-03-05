@@ -144,7 +144,6 @@ function defineTargetShape() {
         [3, 8],
         [4, 8],
         [5, 8],
-        [6, 8],
         [7, 8],
         [8, 8],
         [9, 8],
@@ -158,7 +157,6 @@ function defineTargetShape() {
         [9, 10],
         [11, 10], // Paws
         [6, 8],
-        [7, 8],
         [6, 9],
         [7, 9], // Tail base
         [7, 10],
@@ -255,7 +253,21 @@ function defineTargetShape() {
         [6, 9],
         [9, 9], // Feet
       ],
-    },
+    },    {
+      name: "Turtle",
+      colors: ["#8FBC8F", "#3CB371", "#2E8B57", "#BDB76B"], // PaleGreen, MediumSeaGreen, SeaGreen, DarkKhaki
+      pattern: [
+        [5, 1], [6, 1], [7, 1], [8, 1], // Shell Top
+        [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], // Shell Middle
+        [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], // Shell Bottom
+        [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], // Body Top
+        [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Body Middle
+        [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], // Body Bottom
+        [5, 7], [8, 7], // Front Legs
+        [5, 8], [8, 8], // Back Legs
+        [6, 9], [7, 9]  // Head
+      ]
+    }
   ];
 
   // Choose a random animal pattern
@@ -473,7 +485,7 @@ function drawGrid() {
 // Draw the target shape (outline)
 function drawTargetShape() {
   // Use a consistent color scheme for the target shape
-  const targetColor = color(100, 100, 100, 180); // Light gray with transparency
+  const targetColor = color(150, 150, 150, 180); // Light gray with transparency
   const targetStrokeColor = color(150, 150, 150); // Darker gray for outline
 
   for (let [x, y] of targetShape) {
@@ -1406,11 +1418,11 @@ function drawCompletedShape() {
   ctx.fillStyle = "#f0f4f8";
   ctx.fillRect(0, 0, shapeSize, shapeSize);
 
-  // Add a title with the animal name
+  /*// Add a title with the animal name
   ctx.fillStyle = "#2c3e50";
   ctx.font = "bold 14px Arial";
   ctx.textAlign = "center";
-  ctx.fillText(selectedAnimal, shapeSize / 2, 15);
+  ctx.fillText(selectedAnimal, shapeSize / 2, 15);*/
 
   // Create a color mapping for this specific animal
   const colorMapping = {};
