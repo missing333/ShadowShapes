@@ -81,6 +81,7 @@ function setup() {
 
 function draw() {
   background("#f0f4f8"); // Light blue-gray background
+  drawTargetShape();
   drawGrid();
   drawTargetShape();
   drawTiles();
@@ -466,6 +467,11 @@ function defineTiles() {
 function drawGrid() {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
+
+      // Check if the cell is part of the target shape
+      const isTarget = targetShape.some(([x, y]) => x === i && y === j);
+    
+
       if (grid[i][j] === 0) {
         // Empty cell
         stroke(200, 210, 220);
@@ -475,7 +481,10 @@ function drawGrid() {
         // Filled cell
         stroke(200, 210, 220);
         strokeWeight(1);
-        fill(grid[i][j]);
+        fill(255,0,0);
+        if(isTarget){
+          fill(100);
+        }
       }
       rect(i * cellSize, j * cellSize, cellSize, cellSize, 3); // Slightly larger rounded corners
     }
@@ -485,7 +494,7 @@ function drawGrid() {
 // Draw the target shape (outline)
 function drawTargetShape() {
   // Use a consistent color scheme for the target shape
-  const targetColor = color(150, 150, 150, 180); // Light gray with transparency
+  const targetColor = color(100, 100, 100, 50); // Light gray with transparency
   const targetStrokeColor = color(150, 150, 150); // Darker gray for outline
 
   for (let [x, y] of targetShape) {
