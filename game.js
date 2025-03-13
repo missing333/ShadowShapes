@@ -13,7 +13,6 @@ let gameWon = false; // Win state
 let selectedAnimal = null;
 let animalColors = null;
 
-
 // DOM elements
 let winModal;
 let leaderboardModal;
@@ -83,8 +82,6 @@ function draw() {
   updateTimer();
   updateScoreAndTimerDisplay();
   if (gameWon) displayWinMessage();
-
-  displayWinMessage();
 }
 
 // Initialize the grid (all cells empty)
@@ -119,35 +116,35 @@ function defineTargetShape() {
         [4, 3],
         [5, 3],
         [6, 3],
-        [7, 3],
-        [8, 3],
+      [7, 3],
+      [8, 3],
         [9, 3], // Head middle
         [5, 4],
         [6, 4],
-        [7, 4],
+      [7, 4],
         [8, 4], // Head bottom
-        [6, 5],
+      [6, 5],
         [7, 5], // Neck
-        [5, 6],
-        [6, 6],
-        [7, 6],
+      [5, 6],
+      [6, 6],
+      [7, 6],
         [8, 6], // Body top
         [4, 7],
-        [5, 7],
-        [6, 7],
+      [5, 7],
+      [6, 7],
         [7, 7],
         [8, 7],
         [9, 7], // Body middle
         [3, 8],
         [4, 8],
-        [5, 8],
-        [7, 8],
-        [8, 8],
-        [9, 8],
+      [5, 8],
+      [7, 8],
+      [8, 8],
+      [9, 8],
         [10, 8], // Body bottom
         [3, 9],
         [4, 9],
-        [9, 9],
+      [9, 9],
         [10, 9], // Legs top
         [2, 10],
         [4, 10],
@@ -171,38 +168,38 @@ function defineTargetShape() {
         [4, 4],
         [5, 4],
         [6, 4],
-        [7, 4],
-        [8, 4],
+      [7, 4],
+      [8, 4],
         [9, 4], // Head top
         [2, 5],
         [3, 5],
         [4, 5],
-        [5, 5],
-        [6, 5],
-        [7, 5],
-        [8, 5],
-        [9, 5],
+      [5, 5],
+      [6, 5],
+      [7, 5],
+      [8, 5],
+      [9, 5],
         [10, 5], // Head with fin
         [2, 6],
         [3, 6],
         [4, 6],
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6],
-        [9, 6],
+      [5, 6],
+      [6, 6],
+      [7, 6],
+      [8, 6],
+      [9, 6],
         [10, 6], // Body top
         [3, 7],
-        [4, 7],
-        [5, 7],
-        [6, 7],
-        [7, 7],
-        [8, 7],
+      [4, 7],
+      [5, 7],
+      [6, 7],
+      [7, 7],
+      [8, 7],
         [9, 7], // Body middle
         [4, 8],
-        [5, 8],
-        [6, 8],
-        [7, 8],
+      [5, 8],
+      [6, 8],
+      [7, 8],
         [8, 8], // Body bottom
         [5, 9],
         [6, 9],
@@ -227,44 +224,80 @@ function defineTargetShape() {
         [7, 4],
         [8, 4],
         [9, 4], // Head
-        [6, 5],
-        [7, 5],
-        [8, 5],
+      [6, 5],
+      [7, 5],
+      [8, 5],
         [9, 5], // Upper body
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6],
-        [9, 6],
+      [5, 6],
+      [6, 6],
+      [7, 6],
+      [8, 6],
+      [9, 6],
         [10, 6], // Middle body
-        [5, 7],
-        [6, 7],
-        [7, 7],
-        [8, 7],
-        [9, 7],
+      [5, 7],
+      [6, 7],
+      [7, 7],
+      [8, 7],
+      [9, 7],
         [10, 7], // Lower body
-        [6, 8],
-        [7, 8],
-        [8, 8],
+      [6, 8],
+      [7, 8],
+      [8, 8],
         [9, 8], // Bottom
         [6, 9],
         [9, 9], // Feet
       ],
-    },    {
+    },
+    {
       name: "Turtle",
       colors: ["#8FBC8F", "#3CB371", "#2E8B57", "#BDB76B"], // PaleGreen, MediumSeaGreen, SeaGreen, DarkKhaki
       pattern: [
-        [5, 1], [6, 1], [7, 1], [8, 1], // Shell Top
-        [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], // Shell Middle
-        [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], // Shell Bottom
-        [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], // Body Top
-        [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], // Body Middle
-        [4, 6], [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], // Body Bottom
-        [5, 7], [8, 7], // Front Legs
-        [5, 8], [8, 8], // Back Legs
-        [6, 9], [7, 9]  // Head
-      ]
-    }
+        [5, 1],
+        [6, 1],
+        [7, 1],
+        [8, 1], // Shell Top
+        [4, 2],
+        [5, 2],
+        [6, 2],
+        [7, 2],
+        [8, 2],
+        [9, 2], // Shell Middle
+        [4, 3],
+      [5, 3],
+        [6, 3],
+        [7, 3],
+      [8, 3],
+        [9, 3], // Shell Bottom
+        [3, 4],
+      [4, 4],
+      [5, 4],
+      [6, 4],
+      [7, 4],
+      [8, 4],
+      [9, 4],
+        [10, 4], // Body Top
+        [3, 5],
+      [4, 5],
+        [5, 5],
+      [6, 5],
+        [7, 5],
+      [8, 5],
+        [9, 5],
+        [10, 5], // Body Middle
+      [4, 6],
+      [5, 6],
+      [6, 6],
+      [7, 6],
+      [8, 6],
+        [9, 6], // Body Bottom
+        [5, 7],
+        [8, 7], // Front Legs
+        [5, 8],
+        [8, 8], // Back Legs
+        [6, 9],
+        [7, 9], // Head
+      ],
+    },
   ];
 
   // Choose a random animal pattern
@@ -463,10 +496,8 @@ function defineTiles() {
 function drawGrid() {
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
-
       // Check if the cell is part of the target shape
       const isTarget = targetShape.some(([x, y]) => x === i && y === j);
-    
 
       if (grid[i][j] === 0) {
         // Empty cell
@@ -477,8 +508,8 @@ function drawGrid() {
         // Filled cell
         stroke(200, 210, 220);
         strokeWeight(1);
-        fill(255,0,0);
-        if(isTarget){
+        fill(255, 0, 0);
+        if (isTarget) {
           fill(100);
         }
       }
@@ -1146,7 +1177,7 @@ async function fetchLeaderboard(playerEmail = null) {
       noEntries.textContent = "No scores yet today. Be the first!";
       leaderboardEntriesElement.appendChild(noEntries);
     } else {
-      data.forEach((entry, index) => {
+    data.forEach((entry, index) => {
         const rank = index + 1;
 
         // Check if this is the current player's entry
@@ -1159,54 +1190,54 @@ async function fetchLeaderboard(playerEmail = null) {
         entryElement.className = `leaderboard-entry${
           isCurrentPlayer ? " highlight" : ""
         }`;
-        entryElement.innerHTML = `
+      entryElement.innerHTML = `
           <span>${rank}</span>
-          <span>${entry.initials}</span>
+        <span>${entry.initials}</span>
           <span>${entry.animal || "Unknown"}</span>
-          <span>${entry.score}</span>
-        `;
-        leaderboardEntriesElement.appendChild(entryElement);
-      });
+        <span>${entry.score}</span>
+      `;
+      leaderboardEntriesElement.appendChild(entryElement);
+    });
 
       // If player is not in top 10 but we have their email, fetch their rank
-      if (playerEmail && !currentPlayerRank) {
-        const { data: playerData, error: playerError } = await supabase
-          .from("leaderboard")
-          .select("*")
-          .eq("email", playerEmail)
+    if (playerEmail && !currentPlayerRank) {
+      const { data: playerData, error: playerError } = await supabase
+        .from("leaderboard")
+        .select("*")
+        .eq("email", playerEmail)
           .gte("created_at", today)
           .lt("created_at", today + "T23:59:59")
           .order("created_at", { ascending: false })
           .limit(1);
 
         if (!playerError && playerData.length > 0) {
-          // Get player's rank
-          const { count, error: countError } = await supabase
-            .from("leaderboard")
-            .select("*", { count: "exact", head: true })
+        // Get player's rank
+        const { count, error: countError } = await supabase
+          .from("leaderboard")
+          .select("*", { count: "exact", head: true })
             .gte("created_at", today)
             .lt("created_at", today + "T23:59:59")
             .gt("score", playerData[0].score);
 
-          if (!countError) {
-            const playerRank = count + 1;
+        if (!countError) {
+          const playerRank = count + 1;
 
             // Add separator
-            const separator = document.createElement("div");
+          const separator = document.createElement("div");
             separator.className = "leaderboard-separator";
-            separator.innerHTML = "...";
-            separator.style.textAlign = "center";
-            leaderboardEntriesElement.appendChild(separator);
+          separator.innerHTML = "...";
+          separator.style.textAlign = "center";
+          leaderboardEntriesElement.appendChild(separator);
 
-            const playerEntry = document.createElement("div");
-            playerEntry.className = "leaderboard-entry highlight";
-            playerEntry.innerHTML = `
-              <span>${playerRank}</span>
+          const playerEntry = document.createElement("div");
+          playerEntry.className = "leaderboard-entry highlight";
+          playerEntry.innerHTML = `
+            <span>${playerRank}</span>
               <span>${playerData[0].initials}</span>
               <span>${playerData[0].animal || "Unknown"}</span>
               <span>${playerData[0].score}</span>
-            `;
-            leaderboardEntriesElement.appendChild(playerEntry);
+          `;
+          leaderboardEntriesElement.appendChild(playerEntry);
           }
         }
       }
