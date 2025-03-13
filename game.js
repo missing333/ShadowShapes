@@ -13,12 +13,6 @@ let gameWon = false; // Win state
 let selectedAnimal = null;
 let animalColors = null;
 
-// Supabase configuration
-const SUPABASE_URL = "https://nwqbnjbhvuhuushsknrf.supabase.co";
-const SUPABASE_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im53cWJuamJodnVodXVzaHNrbnJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA1NDI3NTYsImV4cCI6MjA1NjExODc1Nn0.5pTKxytDPg-EesdG8bL5jyWDJtjHFVbFs-eKaLBq7Ho";
-// Fix the Supabase client initialization
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // DOM elements
 let winModal;
