@@ -80,7 +80,7 @@ function draw() {
   if (selectedTile) drawSelectedTile();
   updateTimer();
   updateScoreAndTimerDisplay();
-  if (gameWon) displayWinMessage();
+  if (gameWon) displayWinMessage(); 
 }
 
 // Initialize the grid (all cells empty)
@@ -197,6 +197,156 @@ function defineTargetShape() {
         // Nose - yellow details (2)
         [12, 8, 2], [12, 9, 2]
       ]
+    },
+    {
+      name: "Tree",
+      colors: ["#795548", "#4CAF50", "#8BC34A", "#FFC107"], // Brown trunk, dark green foliage, light green highlights, yellow accents
+      pattern: [
+        // Trunk - brown (0)
+        ...[...Array(4)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 10, j + 14, 0])),
+        
+        // Foliage base - dark green (1)
+        ...[...Array(12)].flatMap((_, i) => [...Array(12)].map((_, j) => {
+          const x = i + 6;
+          const y = j + 4;
+          // Create circular foliage pattern
+          const centerX = 12;
+          const centerY = 10;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 6 ? [x, y, 1] : null;
+        })).filter(coord => coord !== null),
+        
+        // Foliage highlights - light green (2)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => {
+          const x = i + 8;
+          const y = j + 6;
+          // Create smaller circular pattern for highlights
+          const centerX = 12;
+          const centerY = 10;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 3 ? [x, y, 2] : null;
+        })).filter(coord => coord !== null),
+        
+        // Fruits/flowers - yellow accents (3)
+        [8, 8, 3], [10, 6, 3], [14, 7, 3], [16, 9, 3], [9, 12, 3]
+      ]
+    },
+    {
+      name: "House",
+      colors: ["#E57373", "#FFECB3", "#90CAF9", "#81C784"], // Red roof, beige walls, blue windows, green accents
+      pattern: [
+        // Walls - beige (1)
+        ...[...Array(14)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 12, 1])),
+        
+        // Roof - red (0)
+        ...[...Array(16)].flatMap((_, i) => {
+          const height = Math.floor(8 * (1 - Math.abs(i - 7.5) / 8));
+          return [...Array(height)].map((_, j) => [i + 4, j + 4 + (8 - height), 0]);
+        }),
+        
+        // Windows - blue (2)
+        ...[...Array(3)].flatMap((_, i) => [...Array(3)].map((_, j) => [i + 7, j + 14, 2])),
+        ...[...Array(3)].flatMap((_, i) => [...Array(3)].map((_, j) => [i + 14, j + 14, 2])),
+        
+        // Door - green (3)
+        ...[...Array(3)].flatMap((_, i) => [...Array(5)].map((_, j) => [i + 10, j + 17, 3])),
+        
+        // Chimney - red (0)
+        ...[...Array(2)].flatMap((_, i) => [...Array(4)].map((_, j) => [i + 16, j + 6, 0]))
+      ]
+    },
+    {
+      name: "Sandcastle",
+      colors: ["#E0C097", "#D4B483", "#C19A6B", "#7FB3D5"], // Light sand, medium sand, dark sand, blue accents
+      pattern: [
+        // Main castle body - light sand (0)
+        ...[...Array(16)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 4, j + 12, 0])),
+        
+        // Towers - medium sand (1)
+        ...[...Array(4)].flatMap((_, i) => [...Array(14)].map((_, j) => [i + 4, j + 8, 1])),
+        ...[...Array(4)].flatMap((_, i) => [...Array(14)].map((_, j) => [i + 16, j + 8, 1])),
+        
+        // Tower tops - dark sand (2)
+        ...[...Array(6)].flatMap((_, i) => [...Array(2)].map((_, j) => [i + 3, j + 6, 2])),
+        ...[...Array(6)].flatMap((_, i) => [...Array(2)].map((_, j) => [i + 15, j + 6, 2])),
+        
+        // Flags and decorations - blue (3)
+        [5, 4, 3], [6, 3, 3], [7, 4, 3],
+        [17, 4, 3], [18, 3, 3], [19, 4, 3],
+        [8, 10, 3], [12, 10, 3], [16, 10, 3],
+        
+        // Windows - dark sand (2)
+        [6, 14, 2], [10, 14, 2], [14, 14, 2],
+        [6, 18, 2], [10, 18, 2], [14, 18, 2]
+      ]
+    },
+    {
+      name: "Mouse",
+      colors: ["#616161", "#424242", "#FFC107", "#4CAF50"], // Gray body, dark gray stripes, yellow eyes, green accents
+      pattern: [
+        // Body - gray (0)
+        ...[...Array(12)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 6, j + 12, 0])),
+        
+        // Head - gray (0)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 6, 0])),
+        
+        // Ears - dark gray (1)
+        ...[...Array(3)].flatMap((_, i) => [...Array(3)].map((_, j) => [i + 7, j + 3, 1])),
+        ...[...Array(3)].flatMap((_, i) => [...Array(3)].map((_, j) => [i + 14, j + 3, 1])),
+        
+        // Tail - gray with dark gray stripes (0 and 1)
+        [18, 12, 0], [19, 11, 0], [20, 10, 0], [21, 9, 0],
+        [19, 12, 1], [20, 11, 1], [21, 10, 1],
+        
+        // Stripes - dark gray (1)
+        [8, 14, 1], [10, 15, 1], [12, 14, 1], [14, 15, 1],
+        [9, 10, 1], [13, 10, 1],
+        
+        // Eyes - yellow (2)
+        [9, 8, 2], [14, 8, 2],
+        
+        // Nose and whiskers - green (3)
+        [11, 9, 3], [12, 9, 3],
+        [7, 10, 3], [6, 10, 3], [16, 10, 3], [17, 10, 3]
+      ]
+    },
+    {
+      name: "Butterfly",
+      colors: ["#9C27B0", "#7B1FA2", "#FFC107", "#4CAF50"], // Purple wings, dark purple details, yellow body, green accents
+      pattern: [
+        // Left wing - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(12)].map((_, j) => {
+          const x = i + 3;
+          const y = j + 6;
+          // Create wing shape
+          const centerX = 8;
+          const centerY = 12;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 6 && x <= 10 ? [x, y, 0] : null;
+        })).filter(coord => coord !== null),
+        
+        // Right wing - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(12)].map((_, j) => {
+          const x = i + 12;
+          const y = j + 6;
+          // Create wing shape
+          const centerX = 16;
+          const centerY = 12;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 6 && x >= 12 ? [x, y, 0] : null;
+        })).filter(coord => coord !== null),
+        
+        // Wing patterns - dark purple (1)
+        [5, 8, 1], [6, 10, 1], [7, 12, 1], [8, 14, 1],
+        [19, 8, 1], [18, 10, 1], [17, 12, 1], [16, 14, 1],
+        
+        // Body - yellow (2)
+        ...[...Array(2)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 11, j + 6, 2])),
+        
+        // Antennae - green (3)
+        [10, 5, 3], [10, 4, 3], [10, 3, 3],
+        [13, 5, 3], [13, 4, 3], [13, 3, 3]
+      ]
     }
   ];
 
@@ -208,12 +358,45 @@ function defineTargetShape() {
   selectedAnimal = selectedPattern.name;
   animalColors = selectedPattern.colors;
 
-  // Set the target shape to the selected pattern
-  targetShape = selectedPattern.pattern;
+  // Get the pattern
+  let pattern = selectedPattern.pattern;
+  
+  // Find the bounds of the pattern
+  let minX = gridSize, maxX = 0, minY = gridSize, maxY = 0;
+  for (let [x, y] of pattern) {
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minY = Math.min(minY, y);
+    maxY = Math.max(maxY, y);
+  }
+  
+  // Calculate the width and height of the pattern
+  const patternWidth = maxX - minX + 1;
+  const patternHeight = maxY - minY + 1;
+  
+  // Calculate the horizontal offset to center the pattern
+  const horizontalOffset = Math.floor((gridSize - patternWidth) / 2) - minX;
+  
+  // Calculate the vertical offset to position the bottom edge 3 rows from the bottom
+  const targetBottomY = gridSize - 4; // 3 rows from bottom (0-indexed)
+  const verticalOffset = targetBottomY - maxY;
+  
+  // Apply both offsets to all coordinates
+  pattern = pattern.map(([x, y, colorIndex]) => [
+    x + horizontalOffset, 
+    y + verticalOffset, 
+    colorIndex
+  ]);
+  
+  // Set the target shape to the adjusted pattern
+  targetShape = pattern;
 
   // Log the selected animal for debugging
   console.log("Selected animal:", selectedAnimal);
   console.log("Animal colors:", animalColors);
+  console.log("Pattern dimensions:", patternWidth, "x", patternHeight);
+  console.log("Bottom edge positioned at row:", targetBottomY);
+  console.log("Horizontal center at column:", Math.floor(gridSize / 2));
 }
 
 // Define 3 random Tetris tiles with shapes, positions, and colors
