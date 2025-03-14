@@ -878,6 +878,7 @@ function mousePressed() {
 
   // Check if it's a right-click (button 2)
   if (mouseButton === RIGHT) {
+    // Prevent the default context menu from appearing
     // If a tile is already selected, rotate it while maintaining position
     if (selectedTile) {
       // Rotate the selected tile
@@ -914,6 +915,7 @@ function mousePressed() {
     }
   }
 
+  // Handle left mouse button for dragging
   for (let i = 0; i < tiles.length; i++) {
     let tile = tiles[i];
     let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
@@ -936,7 +938,7 @@ function mousePressed() {
           offsetX: mouseX - tile.posX,
           offsetY: mouseY - tile.posY,
         };
-        return false;
+        return false; // Prevent default context menu
       }
     }
   }
