@@ -169,7 +169,8 @@ function defineTargetShape() {
         
         // Head (8x8) - orange body (0)
         ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 5, 0])),
-        
+           [16, 7, 0], [16, 8, 0], [16, 9, 0], 
+
         // Mane (15x15) - dark orange mane (1)
         ...[...Array(15)].flatMap((_, i) => [...Array(15)].map((_, j) => {
           const x = i + 5;
@@ -184,7 +185,6 @@ function defineTargetShape() {
         // Tail - yellow details (2)
         [18, 15, 2], [19, 16, 2], [20, 17, 2],
         [19, 15, 2], [20, 16, 2], [21, 17, 2],
-        [16, 7, 2], [16, 8, 2], [16, 9, 2], 
         
         // Legs - dark orange (1)
         [6, 19, 1], [7, 19, 1], [8, 19, 1],
@@ -315,38 +315,206 @@ function defineTargetShape() {
       name: "Butterfly",
       colors: ["#9C27B0", "#7B1FA2", "#FFC107", "#4CAF50"], // Purple wings, dark purple details, yellow body, green accents
       pattern: [
-        // Left wing - purple (0)
-        ...[...Array(10)].flatMap((_, i) => [...Array(12)].map((_, j) => {
+        // Left wing bottom - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(20)].map((_, j) => {
           const x = i + 3;
-          const y = j + 6;
+          const y = j + 5;
           // Create wing shape
-          const centerX = 8;
-          const centerY = 12;
+          const centerX = 10;
+          const centerY = 17;
           const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-          return distance <= 6 && x <= 10 ? [x, y, 0] : null;
+          return distance <= 5 && x <= 10 ? [x, y, 0] : null;
         })).filter(coord => coord !== null),
         
-        // Right wing - purple (0)
-        ...[...Array(10)].flatMap((_, i) => [...Array(12)].map((_, j) => {
-          const x = i + 12;
-          const y = j + 6;
+        // Left wing top - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(20)].map((_, j) => {
+          const x = i + 2;
+          const y = j + 5;
           // Create wing shape
-          const centerX = 16;
-          const centerY = 12;
+          const centerX = 6;
+          const centerY = 10;
           const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-          return distance <= 6 && x >= 12 ? [x, y, 0] : null;
+          return distance <= 5 && x <= 10 ? [x, y, 0] : null;
         })).filter(coord => coord !== null),
+
+
+        // Right wing bottom - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(20)].map((_, j) => {
+          const x = i + 12;
+          const y = j + 5;
+          // Create wing shape
+          const centerX = 13;
+          const centerY = 17;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 5 && x >= 13 ? [x, y, 0] : null;
+        })).filter(coord => coord !== null),
+        
+        // Right wing top - purple (0)
+        ...[...Array(10)].flatMap((_, i) => [...Array(20)].map((_, j) => {
+          const x = i + 12;
+          const y = j + 5;
+          // Create wing shape
+          const centerX = 17;
+          const centerY = 10;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 5 && x >= 12 ? [x, y, 0] : null;
+        })).filter(coord => coord !== null),
+
         
         // Wing patterns - dark purple (1)
         [5, 8, 1], [6, 10, 1], [7, 12, 1], [8, 14, 1],
         [19, 8, 1], [18, 10, 1], [17, 12, 1], [16, 14, 1],
         
         // Body - yellow (2)
-        ...[...Array(2)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 11, j + 6, 2])),
+        ...[...Array(2)].flatMap((_, i) => [...Array(15)].map((_, j) => [i + 11, j + 6, 2])),
         
         // Antennae - green (3)
-        [10, 5, 3], [10, 4, 3], [10, 3, 3],
-        [13, 5, 3], [13, 4, 3], [13, 3, 3]
+        [11, 5, 3], [10, 4, 3], [10, 3, 3],
+        [12, 5, 3], [13, 4, 3], [13, 3, 3]
+      ]
+    },
+    {
+      name: "Castle",
+      colors: ["#607D8B", "#455A64", "#CFD8DC", "#FF5722"], // Main walls, dark details, light accents, orange/red accents
+      pattern: [
+        // Main castle body - main walls (0)
+        ...[...Array(16)].flatMap((_, i) => [...Array(14)].map((_, j) => [i + 4, j + 8, 0])),
+        
+        // Castle towers - dark details (1)
+        ...[...Array(4)].flatMap((_, i) => [...Array(16)].map((_, j) => [i + 4, j + 6, 1])),
+        ...[...Array(4)].flatMap((_, i) => [...Array(16)].map((_, j) => [i + 16, j + 6, 1])),
+        
+        // Castle battlements - main walls (0)
+        [4, 5, 0], [6, 5, 0], [8, 5, 0], [10, 5, 0], [12, 5, 0], [14, 5, 0], [16, 5, 0], [18, 5, 0], [20, 5, 0],
+        
+        // Castle gate - dark details (1)
+        ...[...Array(4)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 10, j + 16, 1])),
+        
+        // Windows - light accents (2)
+        [6, 10, 2], [6, 14, 2], [18, 10, 2], [18, 14, 2],
+        [10, 10, 2], [14, 10, 2],
+        
+        // Flags - orange/red accents (3)
+        [4, 4, 3], [5, 3, 3], [6, 4, 3],
+        [18, 4, 3], [19, 3, 3], [20, 4, 3]
+      ]
+    },
+    {
+      name: "Rocket",
+      colors: ["#F44336", "#9E9E9E", "#2196F3", "#FFEB3B"], // Red body, gray details, blue windows, yellow flames
+      pattern: [
+        // Rocket body - red (0)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 12, 0])),
+        
+        // Rocket nose cone - red (0)
+        ...[...Array(8)].flatMap((_, i) => {
+          const width = Math.floor(8 * (i / 8));
+          return [...Array(width)].map((_, j) => [j + 8 + (8 - width) / 2, i + 4, 0]);
+        }),
+        
+        // Rocket fins - gray (1)
+        ...[...Array(4)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 4, j + 14, 1])),
+        ...[...Array(4)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 16, j + 14, 1])),
+        
+        // Windows - blue (2)
+        [11, 8, 2], [12, 8, 2], 
+        [10, 10, 2], [11, 10, 2], [12, 10, 2], [13, 10, 2],
+        
+        // Flames - yellow (3)
+        ...[...Array(6)].flatMap((_, i) => {
+          const width = Math.floor(6 * (1 - i / 6));
+          return [...Array(width)].map((_, j) => [j + 9 + (6 - width) / 2, i + 20, 3]);
+        })
+      ]
+    },
+    {
+      name: "Fish",
+      colors: ["#03A9F4", "#0288D1", "#FFECB3", "#FF5722"], // Blue body, dark blue details, light yellow fins, orange accents
+      pattern: [
+        // Fish body - blue (0)
+        ...[...Array(14)].flatMap((_, i) => {
+          const height = Math.floor(8 * (1 - Math.abs(i - 7) / 8));
+          return [...Array(height)].map((_, j) => [i + 6, j + 8 + (8 - height) / 2, 0]);
+        }),
+        
+        // Fish tail - dark blue (1)
+        ...[...Array(6)].flatMap((_, i) => {
+          const height = Math.floor(8 * (i / 6));
+          return [...Array(height)].map((_, j) => [i + 20, j + 8 + (8 - height) / 2, 1]);
+        }),
+        
+        // Fish fins - light yellow (2)
+        [10, 6, 2], [11, 5, 2], [12, 6, 2],
+        [10, 16, 2], [11, 17, 2], [12, 16, 2],
+        [16, 8, 2], [17, 7, 2], [16, 15, 2], [17, 16, 2],
+        
+        // Fish eye and details - orange (3)
+        [7, 10, 3], [8, 10, 3],
+        [9, 12, 3], [10, 13, 3], [11, 12, 3]
+      ]
+    },
+    {
+      name: "Cactus",
+      colors: ["#4CAF50", "#388E3C", "#8BC34A", "#FFC107"], // Green body, dark green details, light green highlights, yellow flowers
+      pattern: [
+        // Main cactus body - green (0)
+        ...[...Array(6)].flatMap((_, i) => [...Array(20)].map((_, j) => [i + 9, j + 4, 0])),
+        [10, 3, 0], [11, 3, 0], [12, 3, 0], [13, 3, 0], 
+        
+        // Left arm - green (0)
+        ...[...Array(6)].flatMap((_, i) => [...Array(4)].map((_, j) => [i + 3, j + 10, 0])),
+        ...[...Array(3)].flatMap((_, i) => [...Array(4)].map((_, j) => [i + 3, j + 6, 0])),
+        
+        // Right arm - green (0)
+        ...[...Array(6)].flatMap((_, i) => [...Array(4)].map((_, j) => [i + 15, j + 12, 0])),
+        ...[...Array(3)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 18, j + 6, 0])),
+        
+        // Cactus details - dark green (1)
+        [8, 8, 1], [8, 12, 1], [8, 16, 1], [8, 20, 1],
+        [15, 8, 1], [15, 12, 1], [15, 16, 1], [15, 20, 1],
+        [5, 10, 1], [5, 14, 1], [20, 12, 1], [20, 16, 1],
+        
+        // Cactus highlights - light green (2)
+        [10, 8, 2], [10, 12, 2], [10, 16, 2], [10, 20, 2],
+        [13, 8, 2], [13, 12, 2], [13, 16, 2], [13, 20, 2],
+        
+        // Flowers - yellow (3)
+        [8, 5, 3], [11, 4, 3], [14, 5, 3],
+        [2, 6, 3], [4, 3, 3], [6, 4, 3],
+        [18, 7, 3], [20, 5, 3], [22, 6, 3]
+      ]
+    },
+    {
+      name: "Sailboat",
+      colors: ["#795548", "#5D4037", "#FFFFFF", "#03A9F4"], // Brown hull, dark brown details, white sails, blue water/accents
+      pattern: [
+        // Boat hull - brown (0)
+        ...[...Array(16)].flatMap((_, i) => [...Array(4)].map((_, j) => [i + 4, j + 18, 0])),
+        
+        // Hull details - dark brown (1)
+        [6, 17, 1], [8, 17, 1], [10, 17, 1], [12, 17, 1], [14, 17, 1], [16, 17, 1], [18, 17, 1],
+        [4, 19, 1], [4, 20, 1], [19, 19, 1], [19, 20, 1],
+        
+        // Main sail - white (2)
+        ...[...Array(10)].flatMap((_, i) => {
+          const height = Math.floor(14 * (1 - i / 10));
+          return [...Array(height)].map((_, j) => [i + 8, j + 4, 2]);
+        }),
+        
+        // Small sail - white (2)
+        ...[...Array(6)].flatMap((_, i) => {
+          const height = Math.floor(8 * (1 - i / 6));
+          return [...Array(height)].map((_, j) => [i + 14, j + 8, 2]);
+        }),
+        
+        // Mast and details - dark brown (1)
+        [12, 4, 1], [12, 5, 1], [12, 6, 1], [12, 7, 1], [12, 8, 1], [12, 9, 1], 
+        [12, 10, 1], [12, 11, 1], [12, 12, 1], [12, 13, 1], [12, 14, 1], [12, 15, 1], [12, 16, 1], [12, 17, 1],
+        [16, 8, 1], [16, 9, 1], [16, 10, 1], [16, 11, 1], [16, 12, 1], [16, 13, 1], [16, 14, 1], [16, 15, 1],
+        
+        // Water/accents - blue (3)
+        [5, 21, 3], [7, 21, 3], [9, 21, 3], [11, 21, 3], [13, 21, 3], [15, 21, 3], [17, 21, 3],
+        [6, 6, 3], [7, 7, 3], [18, 10, 3], [19, 11, 3]
       ]
     }
   ];
@@ -1539,7 +1707,7 @@ function drawCompletedShape() {
   completedShapeCanvas.height = shapeSize;
   completedShapeCanvas.style.display = "block";
   completedShapeCanvas.style.margin = "0 auto 20px auto";
-  completedShapeCanvas.style.borderRadius = "8px";
+  completedShapeCanvas.style.borderRadius = "10px";
   completedShapeCanvas.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
 
   // Get the 2D context for drawing
@@ -1584,7 +1752,7 @@ function drawCompletedShape() {
 
     // Draw rounded rectangle
     ctx.beginPath();
-    const radius = 3;
+    const radius = 2;
     ctx.moveTo(drawX + radius, drawY);
     ctx.lineTo(drawX + cellSizeMini - radius, drawY);
     ctx.arcTo(
