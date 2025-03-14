@@ -102,202 +102,91 @@ function defineTargetShape() {
   // Define animal patterns with their names and colors
   const animalPatterns = [
     {
-      name: "Cat",
-      colors: ["#2c3e50", "#34495e", "#ecf0f1", "#f39c12"], // Dark body, lighter details, white face, orange eyes
+      name: "Elephant",
+      colors: ["#34495e", "#7f8c8d", "#ecf0f1", "#e67e22"], // Dark body, gray details, white tusks, orange accents
       pattern: [
-        [5, 1],
-        [8, 1], // Ear tips
-        [4, 2],
-        [5, 2],
-        [6, 2],
-        [7, 2],
-        [8, 2],
-        [9, 2], // Head top with ears
-        [4, 3],
-        [5, 3],
-        [6, 3],
-        [7, 3],
-        [8, 3],
-        [9, 3], // Head middle
-        [5, 4],
-        [6, 4],
-        [7, 4],
-        [8, 4], // Head bottom
-        [6, 5],
-        [7, 5], // Neck
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6], // Body top
-        [4, 7],
-        [5, 7],
-        [6, 7],
-        [7, 7],
-        [8, 7],
-        [9, 7], // Body middle
-        [3, 8],
-        [4, 8],
-        [5, 8],
-        [7, 8],
-        [8, 8],
-        [9, 8],
-        [10, 8], // Body bottom
-        [3, 9],
-        [4, 9],
-        [9, 9],
-        [10, 9], // Legs top
-        [2, 10],
-        [4, 10],
-        [9, 10],
-        [11, 10], // Paws
-        [6, 8],
-        [6, 9],
-        [7, 9], // Tail base
-        [7, 10],
-        [8, 10], // Tail end
-      ],
+        // Body (15x12)
+        ...[...Array(15)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 5, j + 7])),
+        
+        // Head (8x8)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 3])),
+        
+        // Trunk (3x6)
+        [11, 2], [12, 2], [13, 2],
+        [13, 1], [14, 1], [15, 1],
+        
+        // Ears (6x8 each)
+        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 5, j + 3])), // Left ear
+        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 13, j + 3])), // Right ear
+        
+        // Tusks
+        [9, 9], [10, 9], [8, 10], [9, 10],
+        [14, 9], [15, 9], [14, 10], [15, 10],
+        
+        // Legs
+        [6, 19], [7, 19], [8, 19],
+        [16, 19], [17, 19], [18, 19],
+        [6, 18], [7, 18], [8, 18],
+        [16, 18], [17, 18], [18, 18]
+      ]
     },
     {
-      name: "Shark",
-      colors: ["#3498db", "#2980b9", "#bdc3c7", "#e74c3c"], // Blue body, dark blue details, white teeth, red fin
+      name: "Dragon",
+      colors: ["#2ecc71", "#27ae60", "#f1c40f", "#e74c3c"], // Green body, dark green details, yellow wings, red accents
       pattern: [
-        [10, 2], // Fin tip
-        [9, 3],
-        [10, 3], // Fin top
-        [3, 4],
-        [4, 4],
-        [5, 4],
-        [6, 4],
-        [7, 4],
-        [8, 4],
-        [9, 4], // Head top
-        [2, 5],
-        [3, 5],
-        [4, 5],
-        [5, 5],
-        [6, 5],
-        [7, 5],
-        [8, 5],
-        [9, 5],
-        [10, 5], // Head with fin
-        [2, 6],
-        [3, 6],
-        [4, 6],
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6],
-        [9, 6],
-        [10, 6], // Body top
-        [3, 7],
-        [4, 7],
-        [5, 7],
-        [6, 7],
-        [7, 7],
-        [8, 7],
-        [9, 7], // Body middle
-        [4, 8],
-        [5, 8],
-        [6, 8],
-        [7, 8],
-        [8, 8], // Body bottom
-        [5, 9],
-        [6, 9],
-        [7, 9], // Tail base
-        [4, 10],
-        [8, 10], // Tail fins
-      ],
+        // Body (15x10)
+        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 8])),
+        
+        // Head (7x6)
+        ...[...Array(7)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 3, j + 5])),
+        
+        // Wings (8x12 each)
+        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 4, j + 3])), // Left wing
+        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 13, j + 3])), // Right wing
+        
+        // Tail (3x8)
+        [18, 15], [19, 16], [20, 17],
+        [19, 15], [20, 16], [21, 17],
+        [20, 15], [21, 16], [22, 17],
+        
+        // Spikes
+        [3, 5], [4, 4], [5, 3],
+        [6, 3], [7, 2], [8, 2],
+        [9, 2], [10, 2], [11, 2]
+      ]
     },
     {
-      name: "Rabbit",
-      colors: ["#bdc3c7", "#ecf0f1", "#95a5a6", "#7f8c8d"], // Light gray body, white ears, gray feet
+      name: "Lion",
+      colors: ["#e67e22", "#d35400", "#f39c12", "#6c3483"], // Orange body, dark orange mane, yellow details, purple accents
       pattern: [
-        [6, 1],
-        [9, 1], // Ear tips
-        [6, 2],
-        [7, 2],
-        [8, 2],
-        [9, 2], // Ears
-        [7, 3],
-        [8, 3], // Head top
-        [6, 4],
-        [7, 4],
-        [8, 4],
-        [9, 4], // Head
-        [6, 5],
-        [7, 5],
-        [8, 5],
-        [9, 5], // Upper body
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6],
-        [9, 6],
-        [10, 6], // Middle body
-        [5, 7],
-        [6, 7],
-        [7, 7],
-        [8, 7],
-        [9, 7],
-        [10, 7], // Lower body
-        [6, 8],
-        [7, 8],
-        [8, 8],
-        [9, 8], // Bottom
-        [6, 9],
-        [9, 9], // Feet
-      ],
-    },
-    {
-      name: "Turtle",
-      colors: ["#8FBC8F", "#3CB371", "#2E8B57", "#BDB76B"], // PaleGreen, MediumSeaGreen, SeaGreen, DarkKhaki
-      pattern: [
-        [5, 1],
-        [6, 1],
-        [7, 1],
-        [8, 1], // Shell Top
-        [4, 2],
-        [5, 2],
-        [6, 2],
-        [7, 2],
-        [8, 2],
-        [9, 2], // Shell Middle
-        [4, 3],
-        [5, 3],
-        [6, 3],
-        [7, 3],
-        [8, 3],
-        [9, 3], // Shell Bottom
-        [3, 4],
-        [4, 4],
-        [5, 4],
-        [6, 4],
-        [7, 4],
-        [8, 4],
-        [9, 4],
-        [10, 4], // Body Top
-        [3, 5],
-        [4, 5],
-        [5, 5],
-        [6, 5],
-        [7, 5],
-        [8, 5],
-        [9, 5],
-        [10, 5], // Body Middle
-        [4, 6],
-        [5, 6],
-        [6, 6],
-        [7, 6],
-        [8, 6],
-        [9, 6], // Body Bottom
-        [5, 7],
-        [8, 7], // Front Legs
-        [5, 8],
-        [8, 8], // Back Legs
-        [6, 9],
-        [7, 9], // Head
-      ],
-    },
+        // Body (15x10)
+        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 10])),
+        
+        // Head (8x8)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 5])),
+        
+        // Mane (15x15)
+        ...[...Array(15)].flatMap((_, i) => [...Array(15)].map((_, j) => {
+          const x = i + 5;
+          const y = j + 3;
+          // Create circular mane pattern
+          const centerX = 12;
+          const centerY = 10;
+          const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
+          return distance <= 8 && distance > 5 ? [x, y] : null;
+        })).filter(coord => coord !== null),
+        
+        // Tail
+        [18, 15], [19, 16], [20, 17],
+        [19, 15], [20, 16], [21, 17],
+        
+        // Legs
+        [6, 19], [7, 19], [8, 19],
+        [16, 19], [17, 19], [18, 19],
+        [6, 18], [7, 18], [8, 18],
+        [16, 18], [17, 18], [18, 18]
+      ]
+    }
   ];
 
   // Choose a random animal pattern
