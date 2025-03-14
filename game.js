@@ -1,5 +1,5 @@
-let gridSize = 15; // 15x15 grid
-let cellSize = 35; // Increase cell size from 30 to 35 pixels
+let gridSize = 25; // 25x25 grid
+let cellSize = 21; // Adjusted cell size to fit the larger grid
 let grid = []; // 2D array for placed tiles
 let targetShape = []; // Coordinates of the target pattern (cat)
 let tiles = []; // Available Tetris tiles
@@ -33,7 +33,7 @@ let instructionsModal;
 let closeInstructionsButton;
 
 function setup() {
-  // Update canvas size to fit the larger grid and cell size (15*35 = 525px for grid)
+  // Update canvas size to fit the larger grid and cell size (25*21 = 525px for grid)
   const canvas = createCanvas(525, 675);
   gameContainer = document.getElementById("game-container");
   canvas.parent(gameContainer);
@@ -508,10 +508,45 @@ function drawGrid() {
         // Filled cell
         stroke(200, 210, 220);
         strokeWeight(1);
-        fill(255, 0, 0);
+        
         if (isTarget) {
-          fill(100);
+          // Correct placement - show green background with checkmark
+          fill('#e6ffe6'); // Light green background
+          rect(i * cellSize, j * cellSize, cellSize, cellSize, 3);
+          
+          // Draw green checkmark
+          stroke('#2ecc71'); // Darker green for checkmark
+          strokeWeight(3);
+          const padding = cellSize * 0.2;
+          const centerX = i * cellSize + cellSize / 2;
+          const centerY = j * cellSize + cellSize / 2;
+          
+          // Draw checkmark
+          beginShape();
+          vertex(centerX - padding, centerY);
+          vertex(centerX - padding/2, centerY + padding);
+          vertex(centerX + padding, centerY - padding);
+          endShape();
+          
+        } else {
+          // Incorrect placement - show red background with X
+          fill('#ffe6e6'); // Light red background
+          rect(i * cellSize, j * cellSize, cellSize, cellSize, 3);
+          
+          // Draw red X
+          stroke('#e74c3c'); // Darker red for X
+          strokeWeight(3);
+          const padding = cellSize * 0.2;
+          const x1 = i * cellSize + padding;
+          const y1 = j * cellSize + padding;
+          const x2 = (i + 1) * cellSize - padding;
+          const y2 = (j + 1) * cellSize - padding;
+          
+          // Draw X
+          line(x1, y1, x2, y2);
+          line(x2, y1, x1, y2);
         }
+        continue;
       }
       rect(i * cellSize, j * cellSize, cellSize, cellSize, 3); // Slightly larger rounded corners
     }
