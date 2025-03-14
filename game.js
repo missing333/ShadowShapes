@@ -861,24 +861,12 @@ function mousePressed() {
   if (mouseButton === RIGHT) {
     // If a tile is already selected, rotate it while maintaining position
     if (selectedTile) {
-      // Get current blocks before rotation
-      const oldBlocks = getRotatedBlocks(
-        selectedTile.blocks,
-        selectedTile.rotation
-      );
-
-      // Rotate
+      // Rotate the selected tile
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
-
-      // Get new blocks after rotation
-      const newBlocks = getRotatedBlocks(
-        selectedTile.blocks,
-        selectedTile.rotation
-      );
-
-      // Adjust offset to keep the tile centered under cursor
-      adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
-
+      
+      // Update the original tile in the tiles array
+      tiles[selectedTile.index].rotation = selectedTile.rotation;
+      
       return false; // Prevent default context menu
     }
 
@@ -898,8 +886,9 @@ function mousePressed() {
           mouseY > y &&
           mouseY < y + cellSize
         ) {
-          // Rotate the tile and update the original tile in the tiles array
+          // Rotate the tile
           tiles[i].rotation = (tile.rotation + 1) % 4;
+          
           return false; // Prevent default context menu
         }
       }
@@ -932,6 +921,39 @@ function mousePressed() {
       }
     }
   }
+}
+
+// Add a new function to recenter a tile after rotation
+function recenterTileAfterRotation(tile, originalPosX, originalPosY) {
+  // Get the blocks before and after rotation
+  const blocksBeforeRotation = getRotatedBlocks(tile.blocks, (tile.rotation + 3) % 4);
+  const blocksAfterRotation = getRotatedBlocks(tile.blocks, tile.rotation);
+  
+  // Find the bounds of the tile before rotation
+  let minXBefore = Infinity, maxXBefore = -Infinity, minYBefore = Infinity, maxYBefore = -Infinity;
+  for (let [dx, dy] of blocksBeforeRotation) {
+    minXBefore = Math.min(minXBefore, dx);
+    maxXBefore = Math.max(maxXBefore, dx);
+    minYBefore = Math.min(minYBefore, dy);
+    maxYBefore = Math.max(maxYBefore, dy);
+  }
+  
+  // Find the bounds of the tile after rotation
+  let minXAfter = Infinity, maxXAfter = -Infinity, minYAfter = Infinity, maxYAfter = -Infinity;
+  for (let [dx, dy] of blocksAfterRotation) {
+    minXAfter = Math.min(minXAfter, dx);
+    maxXAfter = Math.max(maxXAfter, dx);
+    minYAfter = Math.min(minYAfter, dy);
+    maxYAfter = Math.max(maxYAfter, dy);
+  }
+  
+  // Calculate the offset differences to maintain the same center position
+  const offsetX = ((minXBefore + maxXBefore) - (minXAfter + maxXAfter)) / 2 * cellSize;
+  const offsetY = ((minYBefore + maxYBefore) - (minYAfter + maxYAfter)) / 2 * cellSize;
+  
+  // Apply the offset to maintain the center position
+  tile.posX = originalPosX + offsetX;
+  tile.posY = originalPosY + offsetY;
 }
 
 // Draw the selected tile as it's dragged
@@ -1213,27 +1235,106 @@ function addNewTile() {
 function repositionTiles() {
   // Calculate the total width of the grid
   const gridWidth = gridSize * cellSize;
-
+  
   // Calculate the starting Y position (just below the grid)
-  const startY = gridSize * cellSize + 20; // 20px padding below grid
-
-  // Calculate spacing between tiles based on available width
-  const spacing = gridWidth / tiles.length;
-
-  // Position each tile
+  const startY = gridSize * cellSize + 40; // 40px padding below grid
+  
+  // Calculate the maximum width of each tile to determine proper spacing
+  const tileWidths = tiles.map(tile => {
+    const rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
+    let minX = Infinity, maxX = -Infinity;
+    for (let [dx, dy] of rotatedBlocks) {
+      minX = Math.min(minX, dx);
+      maxX = Math.max(maxX, dx);
+    }
+    return (maxX - minX + 1) * cellSize;
+  });
+  
+  // Calculate the total width needed for all tiles
+  const totalTileWidth = tileWidths.reduce((sum, width) => sum + width, 0);
+  
+  // Calculate the spacing between tiles (equal spacing)
+  const spacing = (gridWidth - totalTileWidth) / (tiles.length + 1);
+  
+  // Position each tile with equal spacing
+  let currentX = spacing; // Start after the first spacing gap
+  
   for (let i = 0; i < tiles.length; i++) {
-    // Center the tiles horizontally
-    tiles[i].posX = i * spacing + spacing / 2 - cellSize;
-    tiles[i].posY = startY;
+    // Calculate the bounds of the current tile
+    const rotatedBlocks = getRotatedBlocks(tiles[i].blocks, tiles[i].rotation);
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (let [dx, dy] of rotatedBlocks) {
+      minX = Math.min(minX, dx);
+      maxX = Math.max(maxX, dx);
+      minY = Math.min(minY, dy);
+      maxY = Math.max(maxY, dy);
+    }
+    
+    const tileWidth = (maxX - minX + 1) * cellSize;
+    const tileHeight = (maxY - minY + 1) * cellSize;
+    
+    // Position the tile with its center at the current X position
+    const centerX = currentX + tileWidth / 2;
+    
+    // Calculate the center of mass of the rotated blocks
+    let centerBlocksX = 0, centerBlocksY = 0;
+    for (let [dx, dy] of rotatedBlocks) {
+      centerBlocksX += dx;
+      centerBlocksY += dy;
+    }
+    centerBlocksX /= rotatedBlocks.length;
+    centerBlocksY /= rotatedBlocks.length;
+    
+    // Position the tile so that its center of mass is at the calculated position
+    tiles[i].posX = centerX - centerBlocksX * cellSize;
+    
+    // Center the tile vertically in the bottom area
+    const centerY = startY + 50; // Center of the 100px high bottom area
+    tiles[i].posY = centerY - centerBlocksY * cellSize;
+    
+    // Move to the next position
+    currentX += tileWidths[i] + spacing;
   }
 }
 
 // Rotate blocks based on rotation state (0, 1, 2, 3 = 0°, 90°, 180°, 270°)
 function getRotatedBlocks(blocks, rotation) {
-  let rotated = blocks.map(([x, y]) => [x, y]);
-  for (let i = 0; i < rotation; i++) {
-    rotated = rotated.map(([x, y]) => [-y, x]); // Rotate 90° clockwise
+  if (rotation === 0) {
+    return blocks.map(([x, y]) => [x, y]); // No rotation needed
   }
+  
+  // Calculate the center of mass
+  let centerX = 0, centerY = 0;
+  for (let [x, y] of blocks) {
+    centerX += x;
+    centerY += y;
+  }
+  centerX /= blocks.length;
+  centerY /= blocks.length;
+  
+  // Rotate around the center of mass
+  let rotated = blocks.map(([x, y]) => {
+    // Translate to origin (relative to center of mass)
+    const relX = x - centerX;
+    const relY = y - centerY;
+    
+    // Apply rotation
+    let newX, newY;
+    if (rotation === 1) { // 90° clockwise
+      newX = -relY;
+      newY = relX;
+    } else if (rotation === 2) { // 180°
+      newX = -relX;
+      newY = -relY;
+    } else { // 270° clockwise (or 90° counterclockwise)
+      newX = relY;
+      newY = -relX;
+    }
+    
+    // Translate back and round to ensure we get integer coordinates
+    return [Math.round(newX + centerX), Math.round(newY + centerY)];
+  });
+  
   return rotated;
 }
 
@@ -1585,26 +1686,11 @@ function keyPressed() {
   if (key === "r" || key === "R") {
     // If a tile is selected, rotate it
     if (selectedTile) {
-      // Get current blocks before rotation
-      const oldBlocks = getRotatedBlocks(
-        selectedTile.blocks,
-        selectedTile.rotation
-      );
-
       // Rotate
       selectedTile.rotation = (selectedTile.rotation + 1) % 4;
 
       // Update the original tile in the tiles array
       tiles[selectedTile.index].rotation = selectedTile.rotation;
-
-      // Get new blocks after rotation
-      const newBlocks = getRotatedBlocks(
-        selectedTile.blocks,
-        selectedTile.rotation
-      );
-
-      // Adjust offset to keep the tile centered under cursor
-      adjustOffsetAfterRotation(selectedTile, oldBlocks, newBlocks);
 
       return false; // Prevent default behavior
     }
@@ -1625,8 +1711,9 @@ function keyPressed() {
           mouseY > y &&
           mouseY < y + cellSize
         ) {
-          // Rotate the tile in the tiles array
+          // Rotate the tile
           tiles[i].rotation = (tile.rotation + 1) % 4;
+          
           return false; // Prevent default behavior
         }
       }
@@ -1637,29 +1724,37 @@ function keyPressed() {
 
 // Add a new function to adjust the offset after rotation
 function adjustOffsetAfterRotation(tile, oldBlocks, newBlocks) {
-  // Calculate the center of the old shape
-  let oldCenterX = 0,
-    oldCenterY = 0;
+  // Find the bounds of the old shape
+  let minXOld = Infinity, maxXOld = -Infinity, minYOld = Infinity, maxYOld = -Infinity;
   for (let [dx, dy] of oldBlocks) {
-    oldCenterX += dx;
-    oldCenterY += dy;
+    minXOld = Math.min(minXOld, dx);
+    maxXOld = Math.max(maxXOld, dx);
+    minYOld = Math.min(minYOld, dy);
+    maxYOld = Math.max(maxYOld, dy);
   }
-  oldCenterX /= oldBlocks.length;
-  oldCenterY /= oldBlocks.length;
-
-  // Calculate the center of the new shape
-  let newCenterX = 0,
-    newCenterY = 0;
+  
+  // Find the bounds of the new shape
+  let minXNew = Infinity, maxXNew = -Infinity, minYNew = Infinity, maxYNew = -Infinity;
   for (let [dx, dy] of newBlocks) {
-    newCenterX += dx;
-    newCenterY += dy;
+    minXNew = Math.min(minXNew, dx);
+    maxXNew = Math.max(maxXNew, dx);
+    minYNew = Math.min(minYNew, dy);
+    maxYNew = Math.max(maxYNew, dy);
   }
-  newCenterX /= newBlocks.length;
-  newCenterY /= newBlocks.length;
-
+  
+  // Calculate the offset differences to maintain the same center position
+  const offsetXDiff = ((minXOld + maxXOld) - (minXNew + maxXNew)) / 2 * cellSize;
+  const offsetYDiff = ((minYOld + maxYOld) - (minYNew + maxYNew)) / 2 * cellSize;
+  
   // Adjust the offset to maintain position
-  tile.offsetX += (newCenterX - oldCenterX) * cellSize;
-  tile.offsetY += (newCenterY - oldCenterY) * cellSize;
+  tile.offsetX += offsetXDiff;
+  tile.offsetY += offsetYDiff;
+  
+  // Also adjust the actual position of the tile in the tiles array
+  if (tile.index !== undefined) {
+    tiles[tile.index].posX += offsetXDiff;
+    tiles[tile.index].posY += offsetYDiff;
+  }
 }
 
 // Add event listeners for modal interactions
