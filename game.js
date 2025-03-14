@@ -74,7 +74,6 @@ function setup() {
 
 function draw() {
   background("#f0f4f8"); // Light blue-gray background
-  drawTargetShape();
   drawGrid();
   drawTargetShape();
   drawTiles();
@@ -105,67 +104,73 @@ function defineTargetShape() {
       name: "Elephant",
       colors: ["#34495e", "#7f8c8d", "#ecf0f1", "#e67e22"], // Dark body, gray details, white tusks, orange accents
       pattern: [
-        // Body (15x12)
-        ...[...Array(15)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 5, j + 7])),
+        // Body (15x12) - dark body color (0)
+        ...[...Array(15)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 5, j + 7, 0])),
         
-        // Head (8x8)
-        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 3])),
+        // Head (8x8) - dark body color (0)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 3, 0])),
         
-        // Trunk (3x6)
-        [11, 2], [12, 2], [13, 2],
-        [13, 1], [14, 1], [15, 1],
+        // Trunk (3x6) - gray details (1)
+        [11, 2, 1], [12, 2, 1], [13, 2, 1],
+        [13, 1, 1], [14, 1, 1], [15, 1, 1],
         
-        // Ears (6x8 each)
-        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 5, j + 3])), // Left ear
-        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 13, j + 3])), // Right ear
+        // Ears (6x8 each) - gray details (1)
+        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 5, j + 3, 1])), // Left ear
+        ...[...Array(6)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 13, j + 3, 1])), // Right ear
         
-        // Tusks
-        [9, 9], [10, 9], [8, 10], [9, 10],
-        [14, 9], [15, 9], [14, 10], [15, 10],
+        // Tusks - white (2)
+        [9, 9, 2], [10, 9, 2], [8, 10, 2], [9, 10, 2],
+        [14, 9, 2], [15, 9, 2], [14, 10, 2], [15, 10, 2],
         
-        // Legs
-        [6, 19], [7, 19], [8, 19],
-        [16, 19], [17, 19], [18, 19],
-        [6, 18], [7, 18], [8, 18],
-        [16, 18], [17, 18], [18, 18]
+        // Legs - gray details (1)
+        [6, 19, 1], [7, 19, 1], [8, 19, 1],
+        [16, 19, 1], [17, 19, 1], [18, 19, 1],
+        [6, 18, 1], [7, 18, 1], [8, 18, 1],
+        [16, 18, 1], [17, 18, 1], [18, 18, 1],
+        
+        // Eyes - orange accents (3)
+        [10, 5, 3], [14, 5, 3]
       ]
     },
     {
       name: "Dragon",
       colors: ["#2ecc71", "#27ae60", "#f1c40f", "#e74c3c"], // Green body, dark green details, yellow wings, red accents
       pattern: [
-        // Body (15x10)
-        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 8])),
+        // Body (15x10) - green body (0)
+        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 8, 0])),
         
-        // Head (7x6)
-        ...[...Array(7)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 3, j + 5])),
+        // Head (7x6) - dark green details (1)
+        ...[...Array(7)].flatMap((_, i) => [...Array(6)].map((_, j) => [i + 3, j + 5, 1])),
         
-        // Wings (8x12 each)
-        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 4, j + 3])), // Left wing
-        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 13, j + 3])), // Right wing
+        // Wings (8x12 each) - yellow wings (2)
+        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 4, j + 3, 2])), // Left wing
+        ...[...Array(8)].flatMap((_, i) => [...Array(12)].map((_, j) => [i + 13, j + 3, 2])), // Right wing
         
-        // Tail (3x8)
-        [18, 15], [19, 16], [20, 17],
-        [19, 15], [20, 16], [21, 17],
-        [20, 15], [21, 16], [22, 17],
+        // Tail (3x8) - dark green details (1)
+        [18, 15, 1], [19, 16, 1], [20, 17, 1],
+        [19, 15, 1], [20, 16, 1], [21, 17, 1],
+        [20, 15, 1], [21, 16, 1], [22, 17, 1],
         
-        // Spikes
-        [3, 5], [4, 4], [5, 3],
-        [6, 3], [7, 2], [8, 2],
-        [9, 2], [10, 2], [11, 2]
+        // Spikes - red accents (3)
+        [3, 5, 3], [4, 4, 3], [5, 3, 3],
+        [6, 3, 3], [7, 2, 3], [8, 2, 3],
+        [9, 2, 3], [10, 2, 3], [11, 2, 3],
+        
+        // Eyes - red accents (3)
+        [5, 6, 3], [7, 6, 3]
       ]
     },
     {
       name: "Lion",
       colors: ["#e67e22", "#d35400", "#f39c12", "#6c3483"], // Orange body, dark orange mane, yellow details, purple accents
       pattern: [
-        // Body (15x10)
-        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 10])),
+        // Body (15x10) - orange body (0)
+        ...[...Array(15)].flatMap((_, i) => [...Array(10)].map((_, j) => [i + 5, j + 10, 0])),
         
-        // Head (8x8)
-        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 5])),
+        // Head (8x8) - orange body (0)
+        ...[...Array(8)].flatMap((_, i) => [...Array(8)].map((_, j) => [i + 8, j + 5, 0])),
         
-        // Mane (15x15)
+        // Mane (15x15) - dark orange mane (1)
         ...[...Array(15)].flatMap((_, i) => [...Array(15)].map((_, j) => {
           const x = i + 5;
           const y = j + 3;
@@ -173,18 +178,24 @@ function defineTargetShape() {
           const centerX = 12;
           const centerY = 10;
           const distance = Math.sqrt(Math.pow(x - centerX, 2) + Math.pow(y - centerY, 2));
-          return distance <= 8 && distance > 5 ? [x, y] : null;
+          return distance <= 8 && distance > 5 ? [x, y, 1] : null;
         })).filter(coord => coord !== null),
         
-        // Tail
-        [18, 15], [19, 16], [20, 17],
-        [19, 15], [20, 16], [21, 17],
+        // Tail - yellow details (2)
+        [18, 15, 2], [19, 16, 2], [20, 17, 2],
+        [19, 15, 2], [20, 16, 2], [21, 17, 2],
         
-        // Legs
-        [6, 19], [7, 19], [8, 19],
-        [16, 19], [17, 19], [18, 19],
-        [6, 18], [7, 18], [8, 18],
-        [16, 18], [17, 18], [18, 18]
+        // Legs - dark orange (1)
+        [6, 19, 1], [7, 19, 1], [8, 19, 1],
+        [16, 19, 1], [17, 19, 1], [18, 19, 1],
+        [6, 18, 1], [7, 18, 1], [8, 18, 1],
+        [16, 18, 1], [17, 18, 1], [18, 18, 1],
+        
+        // Eyes - purple accents (3)
+        [10, 7, 3], [14, 7, 3],
+        
+        // Nose - yellow details (2)
+        [12, 8, 2], [12, 9, 2]
       ]
     }
   ];
@@ -445,10 +456,10 @@ function drawGrid() {
 // Draw the target shape (outline)
 function drawTargetShape() {
   // Use a consistent color scheme for the target shape
-  const targetColor = color(100, 100, 100, 50); // Light gray with transparency
+  const targetColor = color(200, 200, 200, 100); // Light gray with transparency
   const targetStrokeColor = color(150, 150, 150); // Darker gray for outline
 
-  for (let [x, y] of targetShape) {
+  for (let [x, y, colorIndex] of targetShape) {
     fill(targetColor);
     stroke(targetStrokeColor);
     strokeWeight(1);
@@ -1378,75 +1389,9 @@ function drawCompletedShape() {
   ctx.fillStyle = "#f0f4f8";
   ctx.fillRect(0, 0, shapeSize, shapeSize);
 
-  /*// Add a title with the animal name
-  ctx.fillStyle = "#2c3e50";
-  ctx.font = "bold 14px Arial";
-  ctx.textAlign = "center";
-  ctx.fillText(selectedAnimal, shapeSize / 2, 15);*/
-
-  // Create a color mapping for this specific animal
-  const colorMapping = {};
-
-  // Apply specific coloring rules based on the animal type
-  if (selectedAnimal === "Cat") {
-    // Color the cat: dark body, white face, orange eyes, lighter details
-    for (let [x, y] of targetShape) {
-      if (y >= 3 && y <= 5 && x >= 6 && x <= 7) {
-        // Face center
-        colorMapping[`${x},${y}`] = 2; // White face
-      } else if ((x === 6 && y === 3) || (x === 7 && y === 3)) {
-        // Eyes
-        colorMapping[`${x},${y}`] = 3; // Orange eyes
-      } else if (y >= 9 && y <= 10) {
-        // Legs and tail
-        colorMapping[`${x},${y}`] = 1; // Lighter details
-      } else {
-        colorMapping[`${x},${y}`] = 0; // Dark body (default)
-      }
-    }
-  } else if (selectedAnimal === "Shark") {
-    // Color the shark: blue body, dark blue details, white teeth, red fin
-    for (let [x, y] of targetShape) {
-      if (y <= 3 || (x >= 9 && y <= 6)) {
-        // Fin
-        colorMapping[`${x},${y}`] = 3; // Red fin
-      } else if (y === 5 && (x === 5 || x === 6 || x === 7)) {
-        // Teeth
-        colorMapping[`${x},${y}`] = 2; // White teeth
-      } else if (x <= 3 || x >= 9 || y >= 9) {
-        // Details
-        colorMapping[`${x},${y}`] = 1; // Dark blue details
-      } else {
-        colorMapping[`${x},${y}`] = 0; // Blue body (default)
-      }
-    }
-  } else if (selectedAnimal === "Rabbit") {
-    // Color the rabbit: body light gray, ears white, feet dark gray
-    for (let [x, y] of targetShape) {
-      if (y <= 3) {
-        // Ears
-        colorMapping[`${x},${y}`] = 1; // White ears
-      } else if (y >= 9) {
-        // Feet
-        colorMapping[`${x},${y}`] = 3; // Dark gray feet
-      } else if (y >= 4 && y <= 5 && x >= 7 && x <= 8) {
-        // Face
-        colorMapping[`${x},${y}`] = 1; // White face
-      } else {
-        colorMapping[`${x},${y}`] = 0; // Light gray body (default)
-      }
-    }
-  } else {
-    // Default coloring if animal type is not recognized
-    for (let [x, y] of targetShape) {
-      colorMapping[`${x},${y}`] = 0; // Use first color for everything
-    }
-  }
-
   // Draw each cell of the completed shape with appropriate colors
-  for (let [x, y] of targetShape) {
-    // Get the color from the mapping
-    const colorIndex = colorMapping[`${x},${y}`] || 0;
+  for (let [x, y, colorIndex = 0] of targetShape) {
+    // Get the color from the animal colors array using the colorIndex
     const fillColor = animalColors[colorIndex];
 
     // Calculate position
@@ -1482,7 +1427,13 @@ function drawCompletedShape() {
       radius
     );
     ctx.lineTo(drawX, drawY + radius);
-    ctx.arcTo(drawX, drawY, drawX + radius, drawY, radius);
+    ctx.arcTo(
+      drawX,
+      drawY,
+      drawX + radius,
+      drawY,
+      radius
+    );
     ctx.closePath();
 
     // Set fill and stroke styles
