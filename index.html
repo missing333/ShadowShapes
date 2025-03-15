@@ -1,14 +1,41 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- google ads -->
+     <!-- google ads -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2029556004547568"
      crossorigin="anonymous"></script>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Shadow Shapes</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        console.log("Starting to load scripts...");
+    </script>
+    <!-- Load p5.js first -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script>
+        console.log("p5.js loaded");
+        // Check if p5 is available
+        if (window.p5) {
+            console.log("p5 is available");
+        } else {
+            console.error("p5 failed to load!");
+        }
+    </script>
+    
+    <!-- Load game.js after p5.js -->
+    <script src="game.js"></script>
+    <script>
+        console.log("game.js loaded");
+        // Check if key functions exist
+        if (typeof setup === 'function') {
+            console.log("setup function exists");
+        } else {
+            console.error("setup function not found!");
+        }
+    </script>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -38,6 +65,7 @@
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
         
         #game-container {
@@ -46,13 +74,15 @@
             border-radius: 12px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            margin-top: 20px;
+            margin: 20px auto;
+            transform-origin: top center;
         }
         
         h1 {
             color: var(--primary-color);
             text-align: center;
             margin-bottom: 10px;
+            font-size: clamp(1.5rem, 5vw, 2.5rem); /* Responsive font size */
         }
         
         .game-info {
@@ -73,6 +103,10 @@
             display: block;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            max-width: 100%;
+            width: auto;
+            height: auto !important; /* Force auto height with !important */
+            object-fit: contain; /* Maintain aspect ratio */
         }
         
         .modal {
@@ -86,7 +120,8 @@
             border-radius: 12px;
             box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
             z-index: 10;
-            width: 350px;
+            width: 90%;
+            max-width: 350px;
             text-align: center;
         }
         
@@ -218,6 +253,30 @@
             font-size: 14px;
             text-align: center;
         }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            #game-container {
+                padding: 10px;
+            }
+            
+            .game-info div {
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+            
+            .modal {
+                padding: 20px;
+            }
+            
+            .instructions-modal ul {
+                margin-left: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -269,7 +328,17 @@
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
-    <script src="game.js"></script>
+    <script>
+        // Ensure canvas height is set to auto after page load
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const canvasElement = document.querySelector("#game-container canvas");
+                if (canvasElement) {
+                    canvasElement.style.height = "auto";
+                    console.log("Canvas height set to auto");
+                }
+            }, 100);
+        });
+    </script>
 </body>
 </html>

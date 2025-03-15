@@ -35,8 +35,19 @@ let closeInstructionsButton;
 function setup() {
   // Update canvas size to fit the larger grid and cell size (25*21 = 525px for grid)
   const canvas = createCanvas(525, 675);
+  console.log("Canvas created with dimensions:", width, "x", height);
+  
   gameContainer = document.getElementById("game-container");
   canvas.parent(gameContainer);
+  console.log("Canvas added to game container");
+
+  // Set the background color once to make sure canvas is visible
+  background("#f0f4f8");
+  
+  // Draw a test rectangle to verify canvas is working
+  fill(255, 0, 0);
+  rect(0, 0, 50, 50);
+  console.log("Drew test rectangle");
 
   // Initialize DOM elements
   winModal = document.getElementById("win-modal");
@@ -70,17 +81,29 @@ function setup() {
   initializeGrid();
   defineTargetShape();
   defineTiles();
+  
+  console.log("Setup completed");
 }
 
 function draw() {
-  background("#f0f4f8"); // Light blue-gray background
+  // Clear the background at the start of each frame
+  background("#f0f4f8");
+  console.log("Drawing frame");
+
+  // Draw the grid
   drawGrid();
+  
+  // Draw the target shape
   drawTargetShape();
+  
+  // Draw placed tiles
   drawTiles();
-  if (selectedTile) drawSelectedTile();
-  updateTimer();
-  updateScoreAndTimerDisplay();
-  if (gameWon) displayWinMessage(); 
+  
+  // Update time display
+  if (!gameWon) {
+    const currentTime = Math.floor((Date.now() - startTime) / 1000);
+    timeDisplay.textContent = `Time: ${currentTime}s`;
+  }
 }
 
 // Initialize the grid (all cells empty)
@@ -765,62 +788,18 @@ function defineTiles() {
 }
 
 function drawGrid() {
-  for (let i = 0; i < gridSize; i++) {
-    for (let j = 0; j < gridSize; j++) {
-      // Check if the cell is part of the target shape
-      const isTarget = targetShape.some(([x, y]) => x === i && y === j);
-
-      if (grid[i][j] === 0) {
-        // Empty cell
-        stroke(200, 210, 220);
-        strokeWeight(1);
-        fill(255);
-      } else {
-        // Filled cell
-        stroke(200, 210, 220);
-        strokeWeight(1);
-        
-        if (isTarget) {
-          // Correct placement - show green background with checkmark
-          fill('#e6ffe6'); // Light green background
-          rect(i * cellSize, j * cellSize, cellSize, cellSize, 3);
-          
-          // Draw green checkmark
-          stroke('#2ecc71'); // Darker green for checkmark
-          strokeWeight(3);
-          const padding = cellSize * 0.2;
-          const centerX = i * cellSize + cellSize / 2;
-          const centerY = j * cellSize + cellSize / 2;
-          
-          // Draw checkmark
-          beginShape();
-          vertex(centerX - padding, centerY);
-          vertex(centerX - padding/2, centerY + padding);
-          vertex(centerX + padding, centerY - padding);
-          endShape();
-          
-        } else {
-          // Incorrect placement - show red background with X
-          fill('#ffe6e6'); // Light red background
-          rect(i * cellSize, j * cellSize, cellSize, cellSize, 3);
-          
-          // Draw red X
-          stroke('#e74c3c'); // Darker red for X
-          strokeWeight(3);
-          const padding = cellSize * 0.2;
-          const x1 = i * cellSize + padding;
-          const y1 = j * cellSize + padding;
-          const x2 = (i + 1) * cellSize - padding;
-          const y2 = (j + 1) * cellSize - padding;
-          
-          // Draw X
-          line(x1, y1, x2, y2);
-          line(x2, y1, x1, y2);
-        }
-        continue;
-      }
-      rect(i * cellSize, j * cellSize, cellSize, cellSize, 3); // Slightly larger rounded corners
-    }
+  console.log("Drawing grid");
+  stroke(200);
+  strokeWeight(1);
+  
+  // Draw vertical lines
+  for (let x = 0; x <= width; x += cellSize) {
+    line(x, 0, x, height - 150);  // Subtract 150 to leave space for tiles
+  }
+  
+  // Draw horizontal lines
+  for (let y = 0; y <= height - 150; y += cellSize) {
+    line(0, y, width, y);
   }
 }
 
