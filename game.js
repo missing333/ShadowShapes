@@ -36,6 +36,7 @@ let closeInstructionsButton;
 let isDragging = false;
 let clickStartTime = 0;
 let startTime = 0; // Start time in milliseconds
+let placedSquares = []; // Array to track placed squares with their status (correct/incorrect)
 
 function setup() {
   // Update canvas size to fit the larger grid and cell size (25*21 = 525px for grid)
@@ -97,13 +98,8 @@ function draw() {
   background("#f0f4f8");
   console.log("Drawing frame");
 
-  // Draw the grid
   drawGrid();
-  
-  // Draw the target shape
   drawTargetShape();
-  
-  // Draw placed tiles
   drawTiles();
   
   // Draw the selected tile if it's being dragged
@@ -816,13 +812,43 @@ function drawGrid() {
     line(0, y, width, y);
   }
   
-  // Debug: Draw the current state of the grid
+  // Draw the current state of the grid
   for (let i = 0; i < gridSize; i++) {
     for (let j = 0; j < gridSize; j++) {
       if (grid[i][j] !== 0) {
-        fill(grid[i][j]);
-        rect(i * cellSize, j * cellSize, cellSize, cellSize);
+        // Find if this square has been evaluated
+        const placedSquare = placedSquares.find(square => square.x === i && square.y === j);
+        
+        if (placedSquare) {
+          // Set background color based on placement accuracy
+          if (placedSquare.isCorrect) {
+            // Light green background for correct placements
+            fill(200, 255, 200); // Light green
+          } else {
+            // Light red background for incorrect placements
+            fill(255, 200, 200); // Light red
+          }
+          
+          // Draw the background
+          noStroke();
+          rect(i * cellSize, j * cellSize, cellSize, cellSize);
+        } else {
+          // Regular tile without evaluation
+          fill(grid[i][j]);
+          rect(i * cellSize, j * cellSize, cellSize, cellSize);
+        }
       }
+    }
+  }
+  
+  // Draw checkmarks and X marks for placed squares
+  for (let square of placedSquares) {
+    if (square.isCorrect) {
+      // Draw green checkmark for correct placement
+      drawCheckmark(square.x * cellSize + cellSize/2, square.y * cellSize + cellSize/2, cellSize * 0.6);
+    } else {
+      // Draw red X for incorrect placement
+      drawXMark(square.x * cellSize + cellSize/2, square.y * cellSize + cellSize/2, cellSize * 0.6);
     }
   }
 }
@@ -1063,9 +1089,24 @@ function mouseReleased() {
 
       if (fits) {
         console.log("Tile fits! Placing on grid");
-        // Place the tile
+        
+        // Place the tile and check each square's accuracy
         for (let [dx, dy] of rotatedBlocks) {
-          grid[gridX + dx][gridY + dy] = selectedTile.color;
+          let newX = gridX + dx;
+          let newY = gridY + dy;
+          
+          // Check if this square overlaps with the target shape
+          let isCorrect = targetShape.some(([x, y]) => x === newX && y === newY);
+          
+          // Place the tile on the grid
+          grid[newX][newY] = selectedTile.color;
+          
+          // Add to placedSquares with status
+          placedSquares.push({
+            x: newX,
+            y: newY,
+            isCorrect: isCorrect
+          });
         }
 
         // Remove the used tile from the tiles array
@@ -1692,6 +1733,7 @@ function resetGame() {
   score = 10000;
   gameWon = false;
   frameCount = 0;
+  placedSquares = []; // Clear placed squares
 
   // Clear inputs
   playerInitialsInput.value = "";
@@ -1937,4 +1979,32 @@ function touchEnded() {
   // Call mouseReleased to handle the touch end
   mouseReleased();
   return false; // Prevent default behavior
+}
+
+// Add function to draw a checkmark
+function drawCheckmark(x, y, size) {
+  push();
+  stroke(0, 180, 0); // Darker green
+  strokeWeight(3);
+  noFill();
+  
+  // Draw checkmark
+  beginShape();
+  vertex(x - size/2, y);
+  vertex(x - size/6, y + size/3);
+  vertex(x + size/2, y - size/2);
+  endShape();
+  pop();
+}
+
+// Add function to draw an X mark
+function drawXMark(x, y, size) {
+  push();
+  stroke(220, 0, 0); // Darker red
+  strokeWeight(3);
+  
+  // Draw X
+  line(x - size/2, y - size/2, x + size/2, y + size/2);
+  line(x + size/2, y - size/2, x - size/2, y + size/2);
+  pop();
 }
