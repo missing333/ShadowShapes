@@ -938,7 +938,7 @@ function mousePressed() {
           offsetX: mouseX - tile.posX,
           offsetY: mouseY - tile.posY,
         };
-        return false; // Prevent default context menu
+        return false;
       }
     }
   }
