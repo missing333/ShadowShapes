@@ -32,6 +32,11 @@ let instructionsButton;
 let instructionsModal;
 let closeInstructionsButton;
 
+// Add these variables at the top of the file, after the other global variables
+let isDragging = false;
+let clickStartTime = 0;
+let startTime = 0; // Start time in milliseconds
+
 function setup() {
   // Update canvas size to fit the larger grid and cell size (25*21 = 525px for grid)
   const canvas = createCanvas(525, 675);
@@ -78,9 +83,11 @@ function setup() {
   // Setup modal interactions
   setupModalInteractions();
 
+  // Initialize game state
   initializeGrid();
   defineTargetShape();
   defineTiles();
+  startTime = Date.now(); // Initialize start time
   
   console.log("Setup completed");
 }
@@ -99,6 +106,11 @@ function draw() {
   // Draw placed tiles
   drawTiles();
   
+  // Draw the selected tile if it's being dragged
+  if (selectedTile && isDragging) {
+    drawSelectedTile();
+  }
+  
   // Update time display
   if (!gameWon) {
     const currentTime = Math.floor((Date.now() - startTime) / 1000);
@@ -108,12 +120,14 @@ function draw() {
 
 // Initialize the grid (all cells empty)
 function initializeGrid() {
+  console.log("Initializing grid with size:", gridSize);
   for (let i = 0; i < gridSize; i++) {
     grid[i] = [];
     for (let j = 0; j < gridSize; j++) {
       grid[i][j] = 0; // 0 = empty
     }
   }
+  console.log("Grid initialized:", grid.length, "x", grid[0].length);
 }
 
 // Define a random target shape for the larger grid
@@ -801,6 +815,16 @@ function drawGrid() {
   for (let y = 0; y <= height - 150; y += cellSize) {
     line(0, y, width, y);
   }
+  
+  // Debug: Draw the current state of the grid
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      if (grid[i][j] !== 0) {
+        fill(grid[i][j]);
+        rect(i * cellSize, j * cellSize, cellSize, cellSize);
+      }
+    }
+  }
 }
 
 // Draw the target shape (outline)
@@ -855,46 +879,11 @@ function drawTiles() {
 function mousePressed() {
   if (gameWon) return; // Disable interaction after winning
 
-  // Check if it's a right-click (button 2)
-  if (mouseButton === RIGHT) {
-    // Prevent the default context menu from appearing
-    // If a tile is already selected, rotate it while maintaining position
-    if (selectedTile) {
-      // Rotate the selected tile
-      selectedTile.rotation = (selectedTile.rotation + 1) % 4;
-      
-      // Update the original tile in the tiles array
-      tiles[selectedTile.index].rotation = selectedTile.rotation;
-      
-      return false; // Prevent default context menu
-    }
+  console.log("Mouse pressed at:", mouseX, mouseY);
+  clickStartTime = millis(); // Record when the click started
+  isDragging = false; // Reset dragging state
 
-    // If no tile is selected, check if we're hovering over a tile to rotate
-    for (let i = 0; i < tiles.length; i++) {
-      let tile = tiles[i];
-      let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
-
-      // Check if mouse is over any block of the tile
-      for (let [dx, dy] of rotatedBlocks) {
-        let x = tile.posX + dx * cellSize;
-        let y = tile.posY + dy * cellSize;
-
-        if (
-          mouseX > x &&
-          mouseX < x + cellSize &&
-          mouseY > y &&
-          mouseY < y + cellSize
-        ) {
-          // Rotate the tile
-          tiles[i].rotation = (tile.rotation + 1) % 4;
-          
-          return false; // Prevent default context menu
-        }
-      }
-    }
-  }
-
-  // Handle left mouse button for dragging
+  // Handle tile selection for potential dragging
   for (let i = 0; i < tiles.length; i++) {
     let tile = tiles[i];
     let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
@@ -910,13 +899,15 @@ function mousePressed() {
         mouseY > y &&
         mouseY < y + cellSize
       ) {
-        // Left mouse button for dragging
+        console.log("Selected tile at index:", i);
+        // Store the tile for potential dragging
         selectedTile = {
           ...tile,
           index: i,
           offsetX: mouseX - tile.posX,
           offsetY: mouseY - tile.posY,
         };
+        console.log("Tile offset:", selectedTile.offsetX, selectedTile.offsetY);
         return false;
       }
     }
@@ -994,14 +985,25 @@ function drawSelectedTile() {
 // Update the selected tile position while dragging
 function mouseDragged() {
   if (selectedTile && !gameWon) {
-    // Update the actual tile position in the tiles array
-    tiles[selectedTile.index].posX = mouseX - selectedTile.offsetX;
-    tiles[selectedTile.index].posY = mouseY - selectedTile.offsetY;
+    // If we've moved more than 5 pixels, consider it a drag
+    if (!isDragging && dist(mouseX, mouseY, mouseX - selectedTile.offsetX + selectedTile.posX, mouseY - selectedTile.offsetY + selectedTile.posY) > 5) {
+      isDragging = true;
+      console.log("Started dragging");
+    }
+    
+    if (isDragging) {
+      console.log("Dragging tile. Mouse position:", mouseX, mouseY);
+      
+      // Update the actual tile position in the tiles array
+      tiles[selectedTile.index].posX = mouseX - selectedTile.offsetX;
+      tiles[selectedTile.index].posY = mouseY - selectedTile.offsetY;
 
-    // Update the selected tile's position too
-    selectedTile.posX = mouseX - selectedTile.offsetX;
-    selectedTile.posY = mouseY - selectedTile.offsetY;
+      // Update the selected tile's position too
+      selectedTile.posX = mouseX - selectedTile.offsetX;
+      selectedTile.posY = mouseY - selectedTile.offsetY;
 
+      console.log("New tile position:", selectedTile.posX, selectedTile.posY);
+    }
     return false; // Prevent default behavior
   }
 }
@@ -1009,56 +1011,88 @@ function mouseDragged() {
 // Place the tile on the grid when released
 function mouseReleased() {
   if (selectedTile && !gameWon) {
-    let gridX = Math.round((mouseX - selectedTile.offsetX) / cellSize);
-    let gridY = Math.round((mouseY - selectedTile.offsetY) / cellSize);
-    let rotatedBlocks = getRotatedBlocks(
-      selectedTile.blocks,
-      selectedTile.rotation
-    );
-    let fits = true;
-
-    // Check if tile fits within grid
-    for (let [dx, dy] of rotatedBlocks) {
-      let newX = gridX + dx;
-      let newY = gridY + dy;
-      if (
-        newX < 0 ||
-        newX >= gridSize ||
-        newY < 0 ||
-        newY >= gridSize ||
-        grid[newX][newY] !== 0
-      ) {
-        fits = false;
-        break;
-      }
+    // Check if this was a click (short duration, minimal movement) or a drag
+    const clickDuration = millis() - clickStartTime;
+    
+    if (!isDragging && clickDuration < 300) {
+      // This was a click, not a drag - rotate the tile
+      console.log("Rotating tile on click");
+      selectedTile.rotation = (selectedTile.rotation + 1) % 4;
+      
+      // Update the original tile in the tiles array
+      tiles[selectedTile.index].rotation = selectedTile.rotation;
+      
+      // Reset selection
+      selectedTile = null;
+      return false;
     }
+    
+    // If we were dragging, try to place the tile
+    if (isDragging) {
+      console.log("Mouse released after dragging. Attempting to place tile");
+      
+      let gridX = Math.round((mouseX - selectedTile.offsetX) / cellSize);
+      let gridY = Math.round((mouseY - selectedTile.offsetY) / cellSize);
+      
+      console.log("Grid coordinates:", gridX, gridY);
+      
+      let rotatedBlocks = getRotatedBlocks(
+        selectedTile.blocks,
+        selectedTile.rotation
+      );
+      let fits = true;
 
-    if (fits) {
-      // Place the tile
+      // Check if tile fits within grid
       for (let [dx, dy] of rotatedBlocks) {
-        grid[gridX + dx][gridY + dy] = selectedTile.color;
+        let newX = gridX + dx;
+        let newY = gridY + dy;
+        console.log("Checking position:", newX, newY);
+        
+        if (
+          newX < 0 ||
+          newX >= gridSize ||
+          newY < 0 ||
+          newY >= gridSize ||
+          grid[newX][newY] !== 0
+        ) {
+          fits = false;
+          console.log("Tile doesn't fit at:", newX, newY);
+          break;
+        }
       }
 
-      // Remove the used tile from the tiles array
-      tiles.splice(selectedTile.index, 1);
+      if (fits) {
+        console.log("Tile fits! Placing on grid");
+        // Place the tile
+        for (let [dx, dy] of rotatedBlocks) {
+          grid[gridX + dx][gridY + dy] = selectedTile.color;
+        }
 
-      // Add a new random tile to the bottom row
-      addNewTile();
+        // Remove the used tile from the tiles array
+        tiles.splice(selectedTile.index, 1);
 
-      // Reposition all tiles evenly
-      repositionTiles();
+        // Add a new random tile to the bottom row
+        addNewTile();
 
-      if (!timerStarted) {
-        timerStarted = true;
+        // Reposition all tiles evenly
+        repositionTiles();
+
+        if (!timerStarted) {
+          timerStarted = true;
+          startTime = Date.now(); // Initialize the start time
+        }
+        checkWinCondition();
+      } else {
+        console.log("Tile doesn't fit, returning to original position");
+        // If it doesn't fit, return the tile to its original position
+        tiles[selectedTile.index].posX = selectedTile.posX;
+        tiles[selectedTile.index].posY = selectedTile.posY;
       }
-      checkWinCondition();
-    } else {
-      // If it doesn't fit, return the tile to its original position
-      tiles[selectedTile.index].posX = selectedTile.posX;
-      tiles[selectedTile.index].posY = selectedTile.posY;
     }
 
+    // Reset selection and dragging state
     selectedTile = null;
+    isDragging = false;
   }
 }
 
@@ -1684,18 +1718,7 @@ function closeInstructions() {
 function keyPressed() {
   // Check if 'R' key is pressed
   if (key === "r" || key === "R") {
-    // If a tile is selected, rotate it
-    if (selectedTile) {
-      // Rotate
-      selectedTile.rotation = (selectedTile.rotation + 1) % 4;
-
-      // Update the original tile in the tiles array
-      tiles[selectedTile.index].rotation = selectedTile.rotation;
-
-      return false; // Prevent default behavior
-    }
-
-    // If no tile is selected, check if we're hovering over a tile to rotate
+    // Check if mouse is over any tile to rotate it
     for (let i = 0; i < tiles.length; i++) {
       let tile = tiles[i];
       let rotatedBlocks = getRotatedBlocks(tile.blocks, tile.rotation);
@@ -1711,6 +1734,7 @@ function keyPressed() {
           mouseY > y &&
           mouseY < y + cellSize
         ) {
+          console.log("Rotating tile with R key at index:", i);
           // Rotate the tile
           tiles[i].rotation = (tile.rotation + 1) % 4;
           
@@ -1894,4 +1918,23 @@ function drawCompletedShape() {
   }
 
   return completedShapeCanvas;
+}
+
+// Add touch event handlers for mobile support
+function touchStarted() {
+  // Call mousePressed to handle the touch start
+  mousePressed();
+  return false; // Prevent default behavior
+}
+
+function touchMoved() {
+  // Call mouseDragged to handle the touch move
+  mouseDragged();
+  return false; // Prevent default behavior
+}
+
+function touchEnded() {
+  // Call mouseReleased to handle the touch end
+  mouseReleased();
+  return false; // Prevent default behavior
 }
