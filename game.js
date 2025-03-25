@@ -96,7 +96,7 @@ function setup() {
 function draw() {
   // Clear the background at the start of each frame
   background("#f0f4f8");
-  console.log("Drawing frame");
+  // console.log("Drawing frame");
 
   drawGrid();
   drawTargetShape();
@@ -993,19 +993,19 @@ function drawSelectedTile() {
     );
   }
 
-  // Draw tile
-  fill(selectedTile.color);
-  stroke(255);
-  strokeWeight(1);
-  for (let [dx, dy] of rotatedBlocks) {
-    rect(
-      mouseX - selectedTile.offsetX + dx * cellSize,
-      mouseY - selectedTile.offsetY + dy * cellSize,
-      cellSize,
-      cellSize,
-      4
-    );
-  }
+  // // Draw tile //this is a duplicate
+  // fill(selectedTile.color);
+  // stroke(255);
+  // strokeWeight(1);
+  // for (let [dx, dy] of rotatedBlocks) {
+  //   rect(
+  //     mouseX - selectedTile.offsetX + dx * cellSize,
+  //     mouseY - selectedTile.offsetY + dy * cellSize,
+  //     cellSize,
+  //     cellSize,
+  //     4
+  //   );
+  // }
 }
 
 // Update the selected tile position while dragging
@@ -1966,18 +1966,57 @@ function drawCompletedShape() {
 function touchStarted() {
   // Call mousePressed to handle the touch start
   mousePressed();
+  
+  // Add Y-offset for touch input
+  if (selectedTile) {
+    selectedTile.touchYOffset = 200; // Add 100px offset for touch input
+    selectedTile.posY -= selectedTile.touchYOffset; // Move the piece up immediately
+  }
+  
   return false; // Prevent default behavior
 }
 
 function touchMoved() {
-  // Call mouseDragged to handle the touch move
-  mouseDragged();
+  // Temporarily adjust mouseY to account for the touch offset
+  if (selectedTile && selectedTile.touchYOffset) {
+    const originalMouseY = mouseY;
+    mouseY -= selectedTile.touchYOffset;
+    mouseDragged();
+    mouseY = originalMouseY; // Restore original mouseY
+  } else {
+    mouseDragged();
+  }
   return false; // Prevent default behavior
 }
 
 function touchEnded() {
+  // Store the current position before removing offset
+  const finalX = selectedTile ? mouseX - selectedTile.offsetX : mouseX;
+  const finalY = selectedTile && selectedTile.touchYOffset ? 
+    mouseY - selectedTile.offsetY - selectedTile.touchYOffset : 
+    mouseY - (selectedTile ? selectedTile.offsetY : 0);
+  
+  // Remove the touch offset before releasing
+  if (selectedTile && selectedTile.touchYOffset) {
+    selectedTile.posY += selectedTile.touchYOffset;
+    delete selectedTile.touchYOffset;
+  }
+  
+  // Store original mouseX/mouseY
+  const originalMouseX = mouseX;
+  const originalMouseY = mouseY;
+  
+  // Temporarily modify mouseX/mouseY to place at the final position
+  mouseX = finalX + (selectedTile ? selectedTile.offsetX : 0);
+  mouseY = finalY + (selectedTile ? selectedTile.offsetY : 0);
+  
   // Call mouseReleased to handle the touch end
   mouseReleased();
+  
+  // Restore original mouseX/mouseY
+  mouseX = originalMouseX;
+  mouseY = originalMouseY;
+  
   return false; // Prevent default behavior
 }
 
