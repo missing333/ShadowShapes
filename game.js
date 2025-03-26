@@ -99,6 +99,8 @@ function draw() {
   if (selectedTile && isDragging) {
     drawSelectedTile();
   }
+
+  if (gameWon) displayWinMessage();
 }
 
 // Initialize the grid (all cells empty)
@@ -756,6 +758,10 @@ function mouseReleased() {
         // Remove the used tile from the tiles array
         tiles.splice(selectedTile.index, 1);
 
+        // Reset selection and dragging state BEFORE checking win condition
+        selectedTile = null;
+        isDragging = false;
+
         // Add a new random tile to the bottom row
         addNewTile();
 
@@ -766,16 +772,26 @@ function mouseReleased() {
           timerStarted = true;
           startTime = Date.now(); // Initialize the start time
         }
+        
+        // Check win condition after everything else is done
         checkWinCondition();
       } else {
         console.log("Tile doesn't fit, returning to original position");
         // If it doesn't fit, return the tile to its original position
         tiles[selectedTile.index].posX = selectedTile.posX;
         tiles[selectedTile.index].posY = selectedTile.posY;
+        
+        // Reset selection and dragging state
+        selectedTile = null;
+        isDragging = false;
       }
+    } else {
+      // If we weren't dragging, just reset the states
+      selectedTile = null;
+      isDragging = false;
     }
-
-    // Reset selection and dragging state
+  } else {
+    // Always reset states even if there's no selected tile or game is won
     selectedTile = null;
     isDragging = false;
   }
@@ -1068,19 +1084,13 @@ function checkWinCondition() {
         (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
         calculateOverPenalty()
     );
+    displayWinMessage(); // Call displayWinMessage when the game is won
   }
 }
 
 // Display win message and show the completed animal shape
 function displayWinMessage() {
-  // Calculate final score
-  let finalScore = Math.max(
-    0,
-    score -
-      (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
-      calculateOverPenalty()
-  );
-
+  
   // Create the completed animal shape with the current animal's colors
   const completedShapeCanvas = drawCompletedShape();
 
@@ -1103,7 +1113,6 @@ function displayWinMessage() {
   winModalTitle.textContent = `${selectedAnimal} Completed!`;
 
   // Show win modal with overlay
-  finalScoreElement.textContent = finalScore;
   winModal.style.display = "block";
   modalOverlay.style.display = "block";
 
