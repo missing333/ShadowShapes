@@ -16,10 +16,10 @@ let animalColors = null;
 // DOM elements
 let winModal;
 let leaderboardModal;
-let finalScoreElement;
-let playerInitialsInput;
-let playerEmailInput;
-let submitScoreButton;
+// let finalScoreElement;
+// let playerInitialsInput;
+// let playerEmailInput;
+// let submitScoreButton;
 let playAgainButton;
 let leaderboardEntriesElement;
 let closeLeaderboardButton;
@@ -56,10 +56,10 @@ function setup() {
   // Initialize DOM elements
   winModal = document.getElementById("win-modal");
   leaderboardModal = document.getElementById("leaderboard-modal");
-  finalScoreElement = document.getElementById("final-score");
-  playerInitialsInput = document.getElementById("player-initials");
-  playerEmailInput = document.getElementById("player-email");
-  submitScoreButton = document.getElementById("submit-score");
+  // finalScoreElement = document.getElementById("final-score");
+  // playerInitialsInput = document.getElementById("player-initials");
+  // playerEmailInput = document.getElementById("player-email");
+  // submitScoreButton = document.getElementById("submit-score");
   playAgainButton = document.getElementById("play-again");
   leaderboardEntriesElement = document.getElementById("leaderboard-entries");
   closeLeaderboardButton = document.getElementById("close-leaderboard");
@@ -69,7 +69,7 @@ function setup() {
   closeInstructionsButton = document.getElementById("close-instructions");
 
   // Add event listeners
-  submitScoreButton.addEventListener("click", submitScore);
+  // submitScoreButton.addEventListener("click", submitScore);
   playAgainButton.addEventListener("click", resetGame);
   closeLeaderboardButton.addEventListener("click", closeLeaderboard);
   instructionsButton.addEventListener("click", showInstructions);
@@ -1133,31 +1133,31 @@ function displayWinMessage() {
 
 // Submit score to leaderboard
 async function submitScore() {
-  const initials = playerInitialsInput.value.toUpperCase();
-  const email = playerEmailInput.value;
+  // const initials = playerInitialsInput.value.toUpperCase();
+  // const email = playerEmailInput.value;
 
-  // Validate inputs
-  if (!initials || initials.length > 3) {
-    alert("Please enter 1-3 letters for your initials.");
-    return;
-  }
+  // // Validate inputs
+  // if (!initials || initials.length > 3) {
+  //   alert("Please enter 1-3 letters for your initials.");
+  //   return;
+  // }
 
-  if (!email || !email.includes("@")) {
-    alert("Please enter a valid email address.");
-    return;
-  }
+  // if (!email || !email.includes("@")) {
+  //   alert("Please enter a valid email address.");
+  //   return;
+  // }
 
-  // Calculate final score
-  let finalScore = Math.max(
-    0,
-    score -
-      (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
-      calculateOverPenalty()
-  );
+  // // Calculate final score
+  // let finalScore = Math.max(
+  //   0,
+  //   score -
+  //     (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
+  //     calculateOverPenalty()
+  // );
 
-  // Show loading state
-  submitScoreButton.textContent = "Submitting...";
-  submitScoreButton.disabled = true;
+  // // Show loading state
+  // submitScoreButton.textContent = "Submitting...";
+  // submitScoreButton.disabled = true;
 
   try {
     // Insert score into Supabase
@@ -1185,9 +1185,9 @@ async function submitScore() {
     console.error("Error submitting score:", error);
     alert("Error submitting score. Please try again.");
   } finally {
-    // Reset button state
-    submitScoreButton.textContent = "Submit Score";
-    submitScoreButton.disabled = false;
+    // // Reset button state
+    // submitScoreButton.textContent = "Submit Score";
+    // submitScoreButton.disabled = false;
   }
 }
 
@@ -1350,9 +1350,9 @@ function resetGame() {
   frameCount = 0;
   placedSquares = []; // Clear placed squares
 
-  // Clear inputs
-  playerInitialsInput.value = "";
-  playerEmailInput.value = "";
+  // // Clear inputs
+  // playerInitialsInput.value = "";
+  // playerEmailInput.value = "";
 
   // Initialize new game
   initializeGrid();
