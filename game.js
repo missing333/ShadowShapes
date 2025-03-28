@@ -73,7 +73,11 @@ function setup() {
   // Add event listeners
   if (playAgainButton) {
     playAgainButton.addEventListener("click", resetGame);
-    console.log("Added play again button event listener");
+    playAgainButton.addEventListener("touchend", function(e) {
+      e.preventDefault(); // Prevent any default touch behavior
+      resetGame();
+    });
+    console.log("Added play again button event listeners for both click and touch");
   } else {
     console.error("Could not find play again button");
   }
@@ -629,12 +633,22 @@ function drawSelectedTile() {
     selectedTile.rotation
   );
 
-  // Calculate grid coordinates where the piece would land
+  // Check if this is a touch interaction with offset
+  const hasTouchOffset = selectedTile.touchYOffset !== undefined;
+
+  // Calculate grid coordinates where the piece would land, accounting for touch offset
   let gridX = Math.round((mouseX - selectedTile.offsetX) / cellSize);
-  let gridY = Math.round((mouseY - selectedTile.offsetY) / cellSize);
+  let gridY;
+  
+  if (hasTouchOffset) {
+    // Adjust for touch offset when calculating the shadow position
+    gridY = Math.round(((mouseY - selectedTile.touchYOffset) - selectedTile.offsetY) / cellSize);
+  } else {
+    gridY = Math.round((mouseY - selectedTile.offsetY) / cellSize);
+  }
 
   // Draw shadow at grid position
-  fill(0, 0, 0, 20);
+  fill(0, 0, 0, 40);
   noStroke();
   for (let [dx, dy] of rotatedBlocks) {
     let newX = gridX + dx;
@@ -652,14 +666,23 @@ function drawSelectedTile() {
     }
   }
 
-  // Draw actual tile at mouse position
+  // Draw actual tile at mouse position with appropriate Y offset for touch
   fill(selectedTile.color);
   stroke(255);
   strokeWeight(1);
+  
+  // Position X is the same for both mouse and touch
+  const tileX = mouseX - selectedTile.offsetX;
+  
+  // Position Y needs to account for touch offset if present
+  const tileY = hasTouchOffset ? 
+    (mouseY - selectedTile.touchYOffset) - selectedTile.offsetY : 
+    mouseY - selectedTile.offsetY;
+  
   for (let [dx, dy] of rotatedBlocks) {
     rect(
-      mouseX - selectedTile.offsetX + dx * cellSize,
-      mouseY - selectedTile.offsetY + dy * cellSize,
+      tileX + dx * cellSize,
+      tileY + dy * cellSize,
       cellSize,
       cellSize,
       4
@@ -1476,30 +1499,8 @@ function closeLeaderboard() {
 
 // Reset game
 function resetGame() {
-  // Hide modals and overlay
-  winModal.style.display = "none";
-  leaderboardModal.style.display = "none";
-  modalOverlay.style.display = "none"; // Make sure overlay is hidden
-
-  // Reset game state
-  grid = [];
-  tiles = [];
-  selectedTile = null;
-  timer = 0;
-  timerStarted = false;
-  score = 10000;
-  gameWon = false;
-  frameCount = 0;
-  placedSquares = []; // Clear placed squares
-
-  // // Clear inputs
-  // playerInitialsInput.value = "";
-  // playerEmailInput.value = "";
-
-  // Initialize new game
-  initializeGrid();
-  defineTargetShape();
-  defineTiles();
+  // Refresh the entire browser window
+  window.location.reload();
 }
 
 // Add functions for instructions
@@ -1726,7 +1727,7 @@ function touchStarted() {
   
   // Add Y-offset for touch input
   if (selectedTile) {
-    selectedTile.touchYOffset = 200; // Add 100px offset for touch input
+    selectedTile.touchYOffset = 200; // Add 200px offset for touch input
     selectedTile.posY -= selectedTile.touchYOffset; // Move the piece up immediately
   }
   
@@ -1734,14 +1735,33 @@ function touchStarted() {
 }
 
 function touchMoved() {
-  // Temporarily adjust mouseY to account for the touch offset
-  if (selectedTile && selectedTile.touchYOffset) {
-    const originalMouseY = mouseY;
-    mouseY -= selectedTile.touchYOffset;
-    mouseDragged();
-    mouseY = originalMouseY; // Restore original mouseY
-  } else {
-    mouseDragged();
+  // Only process dragging if we have a selected tile
+  if (selectedTile && !gameWon) {
+    // If we've moved more than 5 pixels, consider it a drag
+    if (!isDragging) {
+      const touchAdjustedY = selectedTile.touchYOffset ? mouseY - selectedTile.touchYOffset : mouseY;
+      if (dist(mouseX, touchAdjustedY, selectedTile.posX + selectedTile.offsetX, selectedTile.posY + selectedTile.offsetY) > 5) {
+        isDragging = true;
+        console.log("Started touch dragging");
+      }
+    }
+    
+    if (isDragging) {
+      console.log("Touch dragging tile. Touch position:", mouseX, mouseY);
+      
+      // For touch, adjust the Y coordinate by touchYOffset
+      const adjustedMouseY = selectedTile.touchYOffset ? mouseY - selectedTile.touchYOffset : mouseY;
+      
+      // Update the actual tile position in the tiles array
+      tiles[selectedTile.index].posX = mouseX - selectedTile.offsetX;
+      tiles[selectedTile.index].posY = adjustedMouseY - selectedTile.offsetY;
+
+      // Update the selected tile's position too
+      selectedTile.posX = mouseX - selectedTile.offsetX;
+      selectedTile.posY = adjustedMouseY - selectedTile.offsetY;
+
+      console.log("New tile position:", selectedTile.posX, selectedTile.posY);
+    }
   }
   return false; // Prevent default behavior
 }
