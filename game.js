@@ -53,27 +53,42 @@ function setup() {
   rect(0, 0, 50, 50);
   console.log("Drew test rectangle");
 
-  // Initialize DOM elements
+  // Initialize DOM elements with debug info
   winModal = document.getElementById("win-modal");
-  leaderboardModal = document.getElementById("leaderboard-modal");
-  // finalScoreElement = document.getElementById("final-score");
-  // playerInitialsInput = document.getElementById("player-initials");
-  // playerEmailInput = document.getElementById("player-email");
-  // submitScoreButton = document.getElementById("submit-score");
+  console.log("Win modal element:", winModal);
+  
+  modalOverlay = document.getElementById("modal-overlay");
+  console.log("Modal overlay element:", modalOverlay);
+  
   playAgainButton = document.getElementById("play-again");
+  console.log("Play again button:", playAgainButton);
+  
+  leaderboardModal = document.getElementById("leaderboard-modal");
   leaderboardEntriesElement = document.getElementById("leaderboard-entries");
   closeLeaderboardButton = document.getElementById("close-leaderboard");
-  modalOverlay = document.getElementById("modal-overlay");
   instructionsButton = document.getElementById("instructions-button");
   instructionsModal = document.getElementById("instructions-modal");
   closeInstructionsButton = document.getElementById("close-instructions");
 
   // Add event listeners
-  // submitScoreButton.addEventListener("click", submitScore);
-  playAgainButton.addEventListener("click", resetGame);
-  closeLeaderboardButton.addEventListener("click", closeLeaderboard);
-  instructionsButton.addEventListener("click", showInstructions);
-  closeInstructionsButton.addEventListener("click", closeInstructions);
+  if (playAgainButton) {
+    playAgainButton.addEventListener("click", resetGame);
+    console.log("Added play again button event listener");
+  } else {
+    console.error("Could not find play again button");
+  }
+  
+  if (closeLeaderboardButton) {
+    closeLeaderboardButton.addEventListener("click", closeLeaderboard);
+  }
+  
+  if (instructionsButton) {
+    instructionsButton.addEventListener("click", showInstructions);
+  }
+  
+  if (closeInstructionsButton) {
+    closeInstructionsButton.addEventListener("click", closeInstructions);
+  }
 
   // Setup modal interactions
   setupModalInteractions();
@@ -99,8 +114,6 @@ function draw() {
   if (selectedTile && isDragging) {
     drawSelectedTile();
   }
-
-  if (gameWon) displayWinMessage();
 }
 
 // Initialize the grid (all cells empty)
@@ -775,6 +788,8 @@ function mouseReleased() {
         
         // Check win condition after everything else is done
         checkWinCondition();
+        // Debug modal state after checking win condition
+        setTimeout(debugModal, 500);
       } else {
         console.log("Tile doesn't fit, returning to original position");
         // If it doesn't fit, return the tile to its original position
@@ -1075,8 +1090,26 @@ function getRotatedBlocks(blocks, rotation) {
 
 // Check if the player has won
 function checkWinCondition() {
-  let allCovered = targetShape.every(([x, y]) => grid[x][y] !== 0);
+  // Don't check again if already won
+  if (gameWon) {
+    console.log("Game already won, not checking again");
+    return;
+  }
+  
+  console.log("Checking win condition...");
+  let allCovered = true;
+  
+  // Check each target shape cell to see if it's covered
+  for (let [x, y] of targetShape) {
+    if (grid[x][y] === 0) {
+      allCovered = false;
+      console.log(`Target cell [${x}, ${y}] is not covered.`);
+      break;
+    }
+  }
+  
   if (allCovered) {
+    console.log("WIN CONDITION MET! All target cells are covered.");
     gameWon = true;
     score = Math.max(
       0,
@@ -1084,51 +1117,160 @@ function checkWinCondition() {
         (timer > 30 ? Math.floor(timer - 30) * 50 : 0) -
         calculateOverPenalty()
     );
-    displayWinMessage(); // Call displayWinMessage when the game is won
+    
+    // Call displayWinMessage immediately and asynchronously
+    console.log("Displaying win message...");
+    setTimeout(() => {
+      displayWinMessage().catch(error => {
+        console.error("Error displaying win message:", error);
+      });
+    }, 100);
+  } else {
+    console.log("Win condition not met yet.");
   }
 }
 
 // Display win message and show the completed animal shape
-function displayWinMessage() {
+async function displayWinMessage() {
+  console.log("displayWinMessage function called");
   
-  // Create the completed animal shape with the current animal's colors
-  const completedShapeCanvas = drawCompletedShape();
+  try {
+    let imageUrl;
+    
+    // Fetch appropriate image based on the selected animal
+    switch(selectedAnimal) {
+      case "Dog":
+        console.log("Fetching dog image...");
+        try {
+          const dogResponse = await fetch('https://dog.ceo/api/breeds/image/random');
+          const dogData = await dogResponse.json();
+          if (dogData.status === "success") {
+            imageUrl = dogData.message;
+          } else {
+            // Fallback to alternative API
+            const alternativeDogResponse = await fetch('https://random.dog/woof.json');
+            const alternativeDogData = await alternativeDogResponse.json();
+            imageUrl = alternativeDogData.url;
+          }
+        } catch (dogError) {
+          console.error("Error fetching dog image:", dogError);
+          imageUrl = "https://images.dog.ceo/breeds/retriever-golden/n02099601_2280.jpg"; // Fallback image
+        }
+        break;
+        
+      case "Cat":
+        console.log("Fetching cat image...");
+        try {
+          const catResponse = await fetch('https://api.thecatapi.com/v1/images/search');
+          const catData = await catResponse.json();
+          imageUrl = catData[0]?.url || "https://cdn2.thecatapi.com/images/8kq.jpg";
+        } catch (catError) {
+          console.error("Error fetching cat image:", catError);
+          imageUrl = "https://cdn2.thecatapi.com/images/8kq.jpg"; // Fallback image
+        }
+        break;
+        
+      case "Duck":
+        console.log("Fetching duck image...");
+        try {
+          imageUrl = "https://random-d.uk/api/randomimg"; // Direct image URL, no parsing needed
+        } catch (duckError) {
+          console.error("Error using duck image:", duckError);
+          imageUrl = "https://random-d.uk/api/60.jpg"; // Fallback image
+        }
+        break;
+        
+      case "Fox":
+        console.log("Fetching fox image...");
+        try {
+          const foxResponse = await fetch('https://randomfox.ca/floof/');
+          const foxData = await foxResponse.json();
+          imageUrl = foxData.image || "https://randomfox.ca/images/41.jpg";
+        } catch (foxError) {
+          console.error("Error fetching fox image:", foxError);
+          imageUrl = "https://randomfox.ca/images/41.jpg"; // Fallback image
+        }
+        break;
+        
+      default:
+        console.log("No animal type matched, using default image");
+        imageUrl = "https://source.unsplash.com/300x300/?animal"; // Generic animal image
+        break;
+    }
+    
+    console.log("Image URL:", imageUrl);
 
-  // Clear any previous animal display
-  const previousAnimal = document.getElementById("completed-animal-win");
-  if (previousAnimal) {
-    previousAnimal.remove();
+    // Create an image element
+    const animalImage = document.createElement('img');
+    animalImage.src = imageUrl;
+    animalImage.style.maxWidth = '200px';
+    animalImage.style.maxHeight = '200px';
+    animalImage.style.objectFit = 'contain';
+    animalImage.style.margin = '0 auto 20px auto';
+    animalImage.style.display = 'block';
+    animalImage.style.borderRadius = '10px';
+    animalImage.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    
+    // Add loading indication
+    animalImage.onerror = () => {
+      console.error("Error loading image:", imageUrl);
+      // Fall back to the original pixel art if the image fails to load
+      const fallbackCanvas = drawCompletedShape();
+      animalImage.parentNode.replaceChild(fallbackCanvas, animalImage);
+    };
+
+    // Clear any previous animal display
+    const previousAnimal = document.getElementById("completed-animal-win");
+    if (previousAnimal) {
+      previousAnimal.remove();
+    }
+
+    // Add ID to the image for easy reference
+    animalImage.id = "completed-animal-win";
+
+    // Find the win modal title
+    const winModalTitle = winModal.querySelector("h2");
+
+    // Insert the image after the title
+    winModalTitle.insertAdjacentElement("afterend", animalImage);
+
+    // Update the win modal title to include the animal name
+    winModalTitle.textContent = `${selectedAnimal} Completed!`;
+
+    // Show win modal with overlay
+    winModal.style.display = "block";
+    modalOverlay.style.display = "block";
+
+    // Log the animal and colors for debugging
+    console.log("Win modal - Animal:", selectedAnimal);
+    console.log("Win modal - Colors:", animalColors);
+    console.log("Win modal is now visible");
+
+    // Prevent immediate closing if user was clicking when they won
+    setTimeout(() => {
+      modalOverlay.addEventListener("click", function checkClick(event) {
+        if (event.target === modalOverlay) {
+          closeAllModals();
+          modalOverlay.removeEventListener("click", checkClick);
+        }
+      });
+    }, 100);
+  } catch (error) {
+    console.error("Error in displayWinMessage:", error);
+    // Fallback to the original pixel art if the image fetch fails
+    const completedShapeCanvas = drawCompletedShape();
+    const previousAnimal = document.getElementById("completed-animal-win");
+    if (previousAnimal) {
+      previousAnimal.remove();
+    }
+    completedShapeCanvas.id = "completed-animal-win";
+    const winModalTitle = winModal.querySelector("h2");
+    winModalTitle.insertAdjacentElement("afterend", completedShapeCanvas);
+    winModalTitle.textContent = `${selectedAnimal} Completed!`;
+    winModal.style.display = "block";
+    modalOverlay.style.display = "block";
+    console.log("Fallback win modal is now visible");
   }
-
-  // Add ID to the canvas for easy reference
-  completedShapeCanvas.id = "completed-animal-win";
-
-  // Find the win modal title
-  const winModalTitle = winModal.querySelector("h2");
-
-  // Insert the canvas after the title
-  winModalTitle.insertAdjacentElement("afterend", completedShapeCanvas);
-
-  // Update the win modal title to include the animal name
-  winModalTitle.textContent = `${selectedAnimal} Completed!`;
-
-  // Show win modal with overlay
-  winModal.style.display = "block";
-  modalOverlay.style.display = "block";
-
-  // Log the animal and colors for debugging
-  console.log("Win modal - Animal:", selectedAnimal);
-  console.log("Win modal - Colors:", animalColors);
-
-  // Prevent immediate closing if user was clicking when they won
-  setTimeout(() => {
-    modalOverlay.addEventListener("click", function checkClick(event) {
-      if (event.target === modalOverlay) {
-        closeAllModals();
-        modalOverlay.removeEventListener("click", checkClick);
-      }
-    });
-  }, 100);
 }
 
 // Submit score to leaderboard
@@ -1661,4 +1803,40 @@ function drawXMark(x, y, size) {
   line(x - size/2, y - size/2, x + size/2, y + size/2);
   line(x + size/2, y - size/2, x - size/2, y + size/2);
   pop();
+}
+
+// Add this function for debugging modal issues
+function debugModal() {
+  console.log("=== DEBUG MODAL INFO ===");
+  console.log("gameWon:", gameWon);
+  console.log("winModal exists:", !!winModal);
+  console.log("modalOverlay exists:", !!modalOverlay);
+  console.log("winModal display style:", winModal ? winModal.style.display : "null");
+  console.log("modalOverlay display style:", modalOverlay ? modalOverlay.style.display : "null");
+  console.log("selectedAnimal:", selectedAnimal);
+  
+  // Check if all target cells are covered
+  let targetCellsCovered = 0;
+  let targetCellsTotal = targetShape.length;
+  for (let [x, y] of targetShape) {
+    if (grid[x][y] !== 0) {
+      targetCellsCovered++;
+    }
+  }
+  console.log(`Target cells covered: ${targetCellsCovered}/${targetCellsTotal}`);
+  console.log("=====================");
+}
+
+// Calculate penalty for placing tiles outside the target shape
+function calculateOverPenalty() {
+  // Count how many squares are placed outside the target shape
+  let overCount = 0;
+  for (let square of placedSquares) {
+    if (!square.isCorrect) {
+      overCount++;
+    }
+  }
+  
+  // Each square outside the target shape incurs a 100-point penalty
+  return overCount * 100;
 }
