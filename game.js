@@ -36,6 +36,10 @@ let clickStartTime = 0;
 let startTime = 0; // Start time in milliseconds
 let placedSquares = []; // Array to track placed squares with their status (correct/incorrect)
 
+// Add variables to track game over state
+let gameOver = false;
+let gameOverMessage = "";
+
 function setup() {
   // Update canvas size to fit the grid and cell size (14*32 = 448px for grid)
   const canvas = createCanvas(448, 598);
@@ -490,6 +494,21 @@ function drawGrid() {
           fill(grid[i][j]);
           rect(i * cellSize, j * cellSize, cellSize, cellSize);
         }
+      } else {
+        // Check if this is part of an isolated region
+        const isolatedSquare = placedSquares.find(square => square.x === i && square.y === j && square.isIsolated);
+        if (isolatedSquare) {
+          // Highlight isolated regions with a pattern
+          fill(255, 100, 100, 120); // Semi-transparent red
+          noStroke();
+          rect(i * cellSize, j * cellSize, cellSize, cellSize);
+          
+          // Add diagonal line pattern to make it clear
+          stroke(255, 0, 0);
+          strokeWeight(2);
+          line(i * cellSize, j * cellSize, (i+1) * cellSize, (j+1) * cellSize);
+          line((i+1) * cellSize, j * cellSize, i * cellSize, (j+1) * cellSize);
+        }
       }
     }
   }
@@ -499,7 +518,7 @@ function drawGrid() {
     if (square.isCorrect) {
       // Draw green checkmark for correct placement
       drawCheckmark(square.x * cellSize + cellSize/2, square.y * cellSize + cellSize/2, cellSize * 0.6);
-    } else {
+    } else if (!square.isIsolated) {
       // Draw red X for incorrect placement
       drawXMark(square.x * cellSize + cellSize/2, square.y * cellSize + cellSize/2, cellSize * 0.6);
     }
@@ -718,7 +737,7 @@ function mouseDragged() {
 
 // Place the tile on the grid when released
 function mouseReleased() {
-  if (selectedTile && !gameWon) {
+  if (selectedTile && !gameWon && !gameOver) {
     // Check if this was a click (short duration, minimal movement) or a drag
     const clickDuration = millis() - clickStartTime;
     
@@ -809,10 +828,16 @@ function mouseReleased() {
           startTime = Date.now(); // Initialize the start time
         }
         
-        // Check win condition after everything else is done
-        checkWinCondition();
-        // Debug modal state after checking win condition
-        setTimeout(debugModal, 500);
+        // Check for isolated spaces after placing the tile
+        checkForIsolatedSpaces();
+        
+        // Only check win condition if not game over
+        if (!gameOver) {
+          // Check win condition after everything else is done
+          checkWinCondition();
+          // Debug modal state after checking win condition
+          setTimeout(debugModal, 500);
+        }
       } else {
         console.log("Tile doesn't fit, returning to original position");
         // If it doesn't fit, return the tile to its original position
@@ -1859,4 +1884,186 @@ function calculateOverPenalty() {
   
   // Each square outside the target shape incurs a 100-point penalty
   return overCount * 100;
+}
+
+// Function to check if the grid has isolated spaces that can't fit any tiles
+function checkForIsolatedSpaces() {
+  if (gameWon || gameOver) return; // Don't check if game is already over
+  
+  console.log("Checking for isolated spaces...");
+  
+  // First, find all empty cells
+  const emptyCells = [];
+  for (let i = 0; i < gridSize; i++) {
+    for (let j = 0; j < gridSize; j++) {
+      if (grid[i][j] === 0) {
+        emptyCells.push([i, j]);
+      }
+    }
+  }
+  
+  if (emptyCells.length === 0) return; // No empty cells, no need to check
+  
+  // Group empty cells into connected regions
+  const regions = [];
+  const visited = new Set();
+  
+  for (const [x, y] of emptyCells) {
+    const key = `${x},${y}`;
+    if (visited.has(key)) continue;
+    
+    // Start a new region with this cell
+    const region = [];
+    const queue = [[x, y]];
+    visited.add(key);
+    
+    // BFS to find all connected empty cells
+    while (queue.length > 0) {
+      const [cx, cy] = queue.shift();
+      region.push([cx, cy]);
+      
+      // Check adjacent cells (up, right, down, left)
+      const directions = [[-1, 0], [0, 1], [1, 0], [0, -1]];
+      for (const [dx, dy] of directions) {
+        const nx = cx + dx;
+        const ny = cy + dy;
+        
+        // Skip if out of bounds
+        if (nx < 0 || nx >= gridSize || ny < 0 || ny >= gridSize) continue;
+        
+        // Skip if not empty or already visited
+        const nKey = `${nx},${ny}`;
+        if (grid[nx][ny] !== 0 || visited.has(nKey)) continue;
+        
+        // Add to queue and mark as visited
+        queue.push([nx, ny]);
+        visited.add(nKey);
+      }
+    }
+    
+    // Add this region to our list of regions
+    regions.push(region);
+  }
+  
+  console.log(`Found ${regions.length} empty regions`);
+  
+  // For each region, check if any tile can fit
+  for (const region of regions) {
+    // Skip large regions (arbitrary threshold - regions with more than 30 cells are likely still playable)
+    if (region.length > 30) continue;
+    
+    let canFitAnyTile = false;
+    
+    // Try to fit each available tile in each possible position and orientation
+    tilesLoop: for (const tile of tiles) {
+      // Try all 4 rotations
+      for (let rotation = 0; rotation < 4; rotation++) {
+        const rotatedBlocks = getRotatedBlocks(tile.blocks, rotation);
+        
+        // Try placing at each empty cell
+        for (const [x, y] of region) {
+          let fits = true;
+          
+          // Check if all blocks of the tile fit within the region
+          for (const [dx, dy] of rotatedBlocks) {
+            const nx = x + dx;
+            const ny = y + dy;
+            
+            // Check bounds and if cell is empty
+            if (nx < 0 || nx >= gridSize || ny < 0 || ny >= gridSize || grid[nx][ny] !== 0) {
+              fits = false;
+              break;
+            }
+          }
+          
+          if (fits) {
+            canFitAnyTile = true;
+            break tilesLoop; // No need to check further
+          }
+        }
+      }
+    }
+    
+    // If this region can't fit any tile, set game over state
+    if (!canFitAnyTile) {
+      console.log(`Found isolated region of size ${region.length} that can't fit any tile`);
+      gameOver = true;
+      gameOverMessage = `There's an inaccessible area on the grid. No tiles can fit in the ${region.length} empty space${region.length > 1 ? 's' : ''}. Press Play Again to restart.`;
+      
+      // Highlight the isolated region
+      highlightIsolatedRegion(region);
+      
+      // Show the gameOver message
+      showGameOverMessage();
+      return;
+    }
+  }
+}
+
+// Function to highlight isolated regions
+function highlightIsolatedRegion(region) {
+  for (const [x, y] of region) {
+    // Add to placedSquares with a special flag for isolated regions
+    placedSquares.push({
+      x: x,
+      y: y,
+      isCorrect: false,
+      isIsolated: true
+    });
+  }
+}
+
+// Function to show game over message
+function showGameOverMessage() {
+  // Create a modal for the game over message
+  const gameOverModal = document.createElement('div');
+  gameOverModal.id = 'game-over-modal';
+  gameOverModal.style.position = 'fixed';
+  gameOverModal.style.top = '50%';
+  gameOverModal.style.left = '50%';
+  gameOverModal.style.transform = 'translate(-50%, -50%)';
+  gameOverModal.style.backgroundColor = '#fff';
+  gameOverModal.style.padding = '20px';
+  gameOverModal.style.borderRadius = '10px';
+  gameOverModal.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+  gameOverModal.style.zIndex = '1000';
+  gameOverModal.style.maxWidth = '80%';
+  gameOverModal.style.textAlign = 'center';
+  
+  // Add message
+  const messageElement = document.createElement('p');
+  messageElement.textContent = gameOverMessage;
+  messageElement.style.marginBottom = '20px';
+  gameOverModal.appendChild(messageElement);
+  
+  // Add play again button
+  const playAgainBtn = document.createElement('button');
+  playAgainBtn.textContent = 'Play Again';
+  playAgainBtn.style.padding = '10px 20px';
+  playAgainBtn.style.backgroundColor = '#3498db';
+  playAgainBtn.style.color = '#fff';
+  playAgainBtn.style.border = 'none';
+  playAgainBtn.style.borderRadius = '5px';
+  playAgainBtn.style.cursor = 'pointer';
+  playAgainBtn.addEventListener('click', resetGame);
+  playAgainBtn.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    resetGame();
+  });
+  gameOverModal.appendChild(playAgainBtn);
+  
+  // Add overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'game-over-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  overlay.style.zIndex = '999';
+  
+  // Add to document
+  document.body.appendChild(overlay);
+  document.body.appendChild(gameOverModal);
 }
