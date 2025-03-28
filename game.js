@@ -575,7 +575,7 @@ function drawTiles() {
 
 // Update the mousePressed function to maintain position when rotating
 function mousePressed() {
-  if (gameWon) return; // Disable interaction after winning
+  if (gameWon || gameOver) return; // Disable interaction after winning
 
   console.log("Mouse pressed at:", mouseX, mouseY);
   clickStartTime = millis(); // Record when the click started
@@ -598,14 +598,17 @@ function mousePressed() {
         mouseY < y + cellSize
       ) {
         console.log("Selected tile at index:", i);
-        // Store the tile for potential dragging
+        // Store the tile for potential dragging along with its original position
         selectedTile = {
           ...tile,
           index: i,
           offsetX: mouseX - tile.posX,
           offsetY: mouseY - tile.posY,
+          originalPosX: tile.posX, // Store original X position
+          originalPosY: tile.posY  // Store original Y position
         };
         console.log("Tile offset:", selectedTile.offsetX, selectedTile.offsetY);
+        console.log("Original position:", selectedTile.originalPosX, selectedTile.originalPosY);
         return false;
       }
     }
@@ -841,8 +844,9 @@ function mouseReleased() {
       } else {
         console.log("Tile doesn't fit, returning to original position");
         // If it doesn't fit, return the tile to its original position
-        tiles[selectedTile.index].posX = selectedTile.posX;
-        tiles[selectedTile.index].posY = selectedTile.posY;
+        // Use the stored original position instead of the current position
+        tiles[selectedTile.index].posX = selectedTile.originalPosX;
+        tiles[selectedTile.index].posY = selectedTile.originalPosY;
         
         // Reset selection and dragging state
         selectedTile = null;
@@ -1752,7 +1756,13 @@ function touchStarted() {
   
   // Add Y-offset for touch input
   if (selectedTile) {
-    selectedTile.touchYOffset = 200; // Add 200px offset for touch input
+    // Store the original position before applying touch offset if not already stored
+    if (selectedTile.originalPosX === undefined) {
+      selectedTile.originalPosX = selectedTile.posX;
+      selectedTile.originalPosY = selectedTile.posY;
+    }
+    
+    selectedTile.touchYOffset = 250; // Add 250px offset for touch input
     selectedTile.posY -= selectedTile.touchYOffset; // Move the piece up immediately
   }
   
@@ -1761,13 +1771,20 @@ function touchStarted() {
 
 function touchMoved() {
   // Only process dragging if we have a selected tile
-  if (selectedTile && !gameWon) {
+  if (selectedTile && !gameWon && !gameOver) {
     // If we've moved more than 5 pixels, consider it a drag
     if (!isDragging) {
       const touchAdjustedY = selectedTile.touchYOffset ? mouseY - selectedTile.touchYOffset : mouseY;
       if (dist(mouseX, touchAdjustedY, selectedTile.posX + selectedTile.offsetX, selectedTile.posY + selectedTile.offsetY) > 5) {
         isDragging = true;
         console.log("Started touch dragging");
+        
+        // Make sure we have the original position stored
+        if (selectedTile.originalPosX === undefined) {
+          selectedTile.originalPosX = tiles[selectedTile.index].posX;
+          selectedTile.originalPosY = tiles[selectedTile.index].posY;
+          console.log("Storing original position:", selectedTile.originalPosX, selectedTile.originalPosY);
+        }
       }
     }
     
@@ -1797,6 +1814,11 @@ function touchEnded() {
   const finalY = selectedTile && selectedTile.touchYOffset ? 
     mouseY - selectedTile.offsetY - selectedTile.touchYOffset : 
     mouseY - (selectedTile ? selectedTile.offsetY : 0);
+  
+  console.log("Touch ended. Final position:", finalX, finalY);
+  console.log("Original position (if tile selected):", 
+    selectedTile ? selectedTile.originalPosX : "N/A", 
+    selectedTile ? selectedTile.originalPosY : "N/A");
   
   // Remove the touch offset before releasing
   if (selectedTile && selectedTile.touchYOffset) {
