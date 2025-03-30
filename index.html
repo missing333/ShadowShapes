@@ -1,15 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-     <!-- google ads -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2029556004547568"
-     crossorigin="anonymous"></script>
+    <!-- Primary Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shadow Shapes</title>
+    <title>Shadow Shapes - Free Online Puzzle Game | Tetris-Style Block Matching</title>
+    <meta name="description" content="Play Shadow Shapes, a free online puzzle game combining elements of Tetris, block matching, and solitaire. Challenge yourself with strategic tile placement, shape rotation, and pattern matching. Perfect for puzzle game enthusiasts!">
+    <meta name="keywords" content="puzzle game, tetris blocks, tile matching, solitaire puzzle, brain games, strategy game, pattern matching, shape rotation, block puzzle, free online game, educational game, logic puzzle, mind games, casual games">
+    <meta name="author" content="Shadow Shapes">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://shadowshapes.com/">
+    <meta property="og:title" content="Shadow Shapes - Free Online Puzzle Game">
+    <meta property="og:description" content="Challenge yourself with this unique puzzle game combining Tetris-style blocks and pattern matching. Perfect for puzzle lovers!">
+    <meta property="og:image" content="https://shadowshapes.com/preview.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://shadowshapes.com/">
+    <meta property="twitter:title" content="Shadow Shapes - Free Online Puzzle Game">
+    <meta property="twitter:description" content="Challenge yourself with this unique puzzle game combining Tetris-style blocks and pattern matching. Perfect for puzzle lovers!">
+    <meta property="twitter:image" content="https://shadowshapes.com/preview.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
+    
+    <!-- google ads -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2029556004547568"
+     crossorigin="anonymous"></script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Shadow Shapes",
+      "description": "A strategic puzzle game combining elements of Tetris and pattern matching. Players must arrange colorful blocks to match target shapes while managing space and planning moves carefully.",
+      "genre": ["Puzzle", "Strategy", "Casual"],
+      "gamePlatform": "Web Browser",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
     <script>
         console.log("Starting to load scripts...");
     </script>
@@ -283,12 +327,28 @@
     <h1>Shadow Shapes</h1>
     
     <div id="game-container">
+        <div class="game-description">
+            <h2>Free Online Puzzle Game</h2>
+            <p>Welcome to Shadow Shapes, a challenging puzzle game that combines the best elements of Tetris, block matching, and solitaire. Test your spatial reasoning and strategic thinking as you arrange colorful blocks to complete animal patterns!</p>
+            
+            <div class="game-features">
+                <h3>Game Features:</h3>
+                <ul>
+                    <li>🧩 Multiple block shapes inspired by classic Tetris</li>
+                    <li>🎯 Strategic pattern matching challenges</li>
+                    <li>🔄 Rotate and position blocks freely</li>
+                    <li>🎮 Touch-friendly controls for mobile devices</li>
+                    <li>🆓 Completely free to play</li>
+                </ul>
+            </div>
+        </div>
+
         <div class="game-info">
             <!-- <div id="time-display">Time: 0s</div>
             <div id="score-display">Score: 10000</div> -->
         </div>
         
-        <button class="instructions" id="instructions-button">?</button>
+        <!-- <button class="instructions" id="instructions-button">?</button> -->
         
         <!-- Win Modal -->
         <div id="win-modal" class="modal">
@@ -307,14 +367,38 @@
                 
         <!-- Instructions Modal -->
         <div id="instructions-modal" class="modal instructions-modal">
-            <h2>How to Play</h2>
-            <ul>
-                <li>Drag and place the colored shapes to fill the pattern</li>
-                <li>Right-click or press 'R' key to rotate shapes</li>
-                <li>Complete the pattern to win</li>
-                <li>Faster completion = higher score</li>
-                <li>Avoid covering areas outside the pattern</li>
-            </ul>
+            <h2>How to Play Shadow Shapes</h2>
+            <div class="instructions-content">
+                <h3>Basic Controls:</h3>
+                <ul>
+                    <li>🖱️ Click and drag blocks to move them</li>
+                    <li>🔄 Right-click or press 'R' to rotate blocks</li>
+                    <li>📱 Touch and drag on mobile devices</li>
+                </ul>
+
+                <h3>Game Rules:</h3>
+                <ul>
+                    <li>Match blocks to the gray pattern outline</li>
+                    <li>Complete the animal shape to win</li>
+                    <li>Faster completion gives higher scores</li>
+                    <li>Avoid placing blocks outside the pattern</li>
+                    <li>Watch for isolated spaces that can't be filled</li>
+                </ul>
+
+                <h3>Scoring System:</h3>
+                <ul>
+                    <li>Start with 10,000 points</li>
+                    <li>Time penalty: -50 points per second after 30 seconds</li>
+                    <li>Misplacement penalty: -100 points per block outside pattern</li>
+                </ul>
+
+                <h3>Pro Tips:</h3>
+                <ul>
+                    <li>Plan your moves carefully to maximize score</li>
+                    <li>Use all block rotations to find the best fit</li>
+                    <li>Keep track of remaining spaces to avoid isolation</li>
+                </ul>
+            </div>
             <button id="close-instructions">Got it!</button>
         </div>
     </div>
@@ -322,8 +406,110 @@
     <div class="overlay" id="modal-overlay"></div>
     
     <footer>
-        &copy; 2025 Shadow Shapes | Created with ♥
+        <div class="footer-content">
+            <div class="game-description">
+                <h3>About Shadow Shapes</h3>
+                <p>Shadow Shapes is a free online puzzle game that challenges players to think strategically while having fun. Perfect for fans of Tetris, block puzzles, and pattern matching games. Exercise your brain with our unique combination of classic gameplay elements!</p>
+            </div>
+            <div class="footer-links">
+                <a href="#" onclick="showInstructions(); return false;">How to Play</a> |
+                <a href="#" onclick="document.getElementById('leaderboard-modal').style.display='block'; return false;">Leaderboard</a>
+            </div>
+            <div class="copyright">
+                &copy; 2025 Shadow Shapes | Created with ♥ | Free Online Puzzle Game
+            </div>
+        </div>
     </footer>
+
+    <style>
+        /* Add these new styles to your existing CSS */
+        .game-description {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .game-description h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .game-description p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: var(--dark-gray);
+        }
+
+        .game-features {
+            background-color: var(--light-gray);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .game-features h3 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .game-features ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .game-features li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .instructions-content {
+            text-align: left;
+            padding: 0 20px;
+        }
+
+        .instructions-content h3 {
+            color: var(--primary-color);
+            margin: 20px 0 10px;
+        }
+
+        .instructions-content ul {
+            margin-bottom: 20px;
+        }
+
+        .instructions-content li {
+            margin-bottom: 8px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .footer-links {
+            margin: 15px 0;
+        }
+
+        .footer-links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            margin: 0 10px;
+        }
+
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+
+        .copyright {
+            margin-top: 15px;
+            font-size: 12px;
+            color: var(--dark-gray);
+        }
+    </style>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
